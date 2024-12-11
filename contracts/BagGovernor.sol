@@ -19,8 +19,11 @@ contract BagGovernor is
     OwnableUpgradeable
 {
 
+    address public tokenCreator;
+
     function initialize(
         IVotes _token, 
+        address _tokenCreator,
         uint48 _votingDelay,      // e.g. 1 block
         uint32 _votingPeriod,     // e.g. 45818 blocks (~ 1 week)
         uint256 _proposalThreshold // e.g. 0 tokens
@@ -34,7 +37,25 @@ contract BagGovernor is
         __GovernorCountingSimple_init();
         __GovernorVotes_init(_token);
         __GovernorVotesQuorumFraction_init(10); // 10% quorum
-        __Ownable_init(msg.sender);
+        __Ownable_init(_tokenCreator);
+
+        tokenCreator = _tokenCreator;
+    }
+
+    // Override propose function to restrict proposal creation
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description
+    ) public virtual override returns (uint256) {
+        // Only token creator can create proposals
+        require(
+            msg.sender == tokenCreator, 
+            "BagGovernor: Only token creator can create proposals"
+        );
+        
+        return super.propose(targets, values, calldatas, description);
     }
 
     // The following functions are overrides required by Solidity.
