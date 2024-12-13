@@ -5,7 +5,7 @@ async function main() {
     // WETH
     // nonfungiblePositionManager Uniswap v3
     // _swapRouter Uniswap V3
-    const protocol_fee_recipient = "0x8aEa0700A9919C5EeFF164611F24DC065Ba77636"
+    const protocol_fee_recipient = "0x973de1CDAce46ddF5904cF46cb96E6d039Ac75C2"
     // get the deployer account
     const [deployer] = await ethers.getSigners();
     console.log("Deploying contracts with the deployer account:", deployer.address);
@@ -38,17 +38,13 @@ async function main() {
     console.log("encoded params:", initializeData);
     const BagFactory = await bagfactory.deploy(BagFactoryImpl.target, initializeData); // can alternatively be set to 0 by inputting "0x" instead
 
-    // Deploy governance token
-    const governance_contract = await ethers.getContractFactory("BagGovernor");
-    const bag_governance = await governance_contract.deploy();
-
     // Print out contract addresses
     console.log("Protocol Rewards Contract address:", ProtocolRewards.target);
     console.log("Bonding Curve address", BondingCurve.target);
     console.log("Bag Token address:", BagTokenImpl.target);
     console.log("Bag Factory Implementation address:", BagFactoryImpl.target);
     console.log("BagFactory address:", BagFactory.target);
-    console.log("Bag Governance address:", bag_governance.target);
+    console.log("Bag Governance address:", BagGovernor.target);
 }
 
 main()
