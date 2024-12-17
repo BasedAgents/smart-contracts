@@ -10,51 +10,51 @@ let deployer;
 let deployedTokenAddress;
 let deployedToken;
 let WETH;
+let user;
 
 // start test block
 describe("Contract Amendment tests", function () {
 
     beforeEach(async function () {
         await setupBag();
-        await deployAgent();
     });
 
     it("testing upgradeable variables", async function () {
         console.log("Initial values of variables:");
-        console.log("MAX_TOTAL_SUPPLY:",await deployedToken.MAX_TOTAL_SUPPLY());
-        console.log("PRIMARY_MARKET_SUPPLY:",await deployedToken.PRIMARY_MARKET_SUPPLY());
-        console.log("SECONDARY_MARKET_SUPPLY:",await deployedToken.SECONDARY_MARKET_SUPPLY());
+        console.log("MAX_TOTAL_SUPPLY:", await deployedToken.MAX_TOTAL_SUPPLY());
+        console.log("PRIMARY_MARKET_SUPPLY:", await deployedToken.PRIMARY_MARKET_SUPPLY());
+        console.log("SECONDARY_MARKET_SUPPLY:", await deployedToken.SECONDARY_MARKET_SUPPLY());
         console.log("graduation tax:", await deployedToken.graduationFee());
-        await deployedToken.upgradeParameters(0,0,0,0,0,0,0,0,0,0);
+        await deployedToken.upgradeParameters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         console.log("Updated all values to 0:");
-        console.log("MAX_TOTAL_SUPPLY:",await deployedToken.MAX_TOTAL_SUPPLY());
-        console.log("PRIMARY_MARKET_SUPPLY:",await deployedToken.PRIMARY_MARKET_SUPPLY());
-        console.log("SECONDARY_MARKET_SUPPLY:",await deployedToken.SECONDARY_MARKET_SUPPLY());
+        console.log("MAX_TOTAL_SUPPLY:", await deployedToken.MAX_TOTAL_SUPPLY());
+        console.log("PRIMARY_MARKET_SUPPLY:", await deployedToken.PRIMARY_MARKET_SUPPLY());
+        console.log("SECONDARY_MARKET_SUPPLY:", await deployedToken.SECONDARY_MARKET_SUPPLY());
         console.log("graduation tax:", await deployedToken.graduationFee());
-    })  
+    })
     it("Uniswap Graduation Fee test", async function () {
         const eth_value = await ethers.parseEther("10");
         await deployAgent();
-        const tx = await deployedToken.connect(user).buy(user.address,user.address,user.address," ", 0, 0, 0,{value: eth_value}); // the function that emits the event
+        const tx = await deployedToken.connect(user).buy(user.address, user.address, user.address, " ", 0, 0, 0, { value: eth_value }); // the function that emits the event
         const receipt = await tx.wait();
 
         // Find the BagMarketGraduated event
-        const event = receipt.logs.find(log => 
-         log.topics[0] === ethers.id("BagMarketGraduated(address,address,uint256,uint256,uint256,uint8)")
+        const event = receipt.logs.find(log =>
+            log.topics[0] === ethers.id("BagMarketGraduated(address,address,uint256,uint256,uint256,uint8)")
         );
 
         // Decode the event
         const decodedEvent = deployedToken.interface.parseLog(event);
         // Log out all values
         console.log({
-        bagAddress: decodedEvent.args[0],      // address(this)
-        poolAddress: decodedEvent.args[1],     // poolAddress
-        ethLiquidity: ethers.formatEther(decodedEvent.args[2]),  // ethLiquidity in ETH
-        secondaryMarketSupply: decodedEvent.args[3],  // SECONDARY_MARKET_SUPPLY
-        positionId: decodedEvent.args[4],      // positionId
-        marketType: decodedEvent.args[5]       // marketType
-    });
-        const tx1 = await deployedToken.connect(user).buy(user.address,user.address,user.address," ", 1,0,0,{value:eth_value});
+            bagAddress: decodedEvent.args[0],      // address(this)
+            poolAddress: decodedEvent.args[1],     // poolAddress
+            ethLiquidity: ethers.formatEther(decodedEvent.args[2]),  // ethLiquidity in ETH
+            secondaryMarketSupply: decodedEvent.args[3],  // SECONDARY_MARKET_SUPPLY
+            positionId: decodedEvent.args[4],      // positionId
+            marketType: decodedEvent.args[5]       // marketType
+        });
+        const tx1 = await deployedToken.connect(user).buy(user.address, user.address, user.address, " ", 1, 0, 0, { value: eth_value });
         const receipt1 = await tx1.wait();
         const event1 = receipt1.logs.find(log =>
             log.topics[0] === ethers.id("BagTokenBuy(address,address,address,uint256,uint256,uint256,uint256,uint256,string,uint256,uint8)")
@@ -75,6 +75,26 @@ describe("Contract Amendment tests", function () {
             marketType: decodedEvent1.args[10],
         });
 
+        const tx2 = await deployedToken.connect(user).sell(decodedEvent1.args[6], user.address, user.address, " ", 1, 0, 0);
+        const receipt2 = await tx2.wait();
+        const event2 = receipt2.logs.find(log =>
+            log.topics[0] === ethers.id("BagTokenSell(address,address,address,uint256,uint256,uint256,uint256,uint256,string,uint256,uint8)")
+        );
+        const decodedEvent2 = deployedToken.interface.parseLog(event2);
+        console.log({
+            sender: decodedEvent2.args[0],
+            recipient: decodedEvent2.args[1],
+            orderReferrer: decodedEvent2.args[2],
+            value: decodedEvent2.args[3],
+            fee: decodedEvent2.args[4],
+            payoutAfterFee: decodedEvent2.args[5],
+            tokensToSell: decodedEvent2.args[6],
+            balanceOf: decodedEvent2.args[7],
+            comment: decodedEvent2.args[8],
+            totalSupply: decodedEvent2.args[9],
+            marketType: decodedEvent2.args[10],
+        });
+
     })
 
 })
@@ -82,7 +102,7 @@ describe("Contract Amendment tests", function () {
 // deployment function
 async function setupBag() {
     // get the deployer account
-    [deployer,user] = await ethers.getSigners();
+    [deployer, user] = await ethers.getSigners();
     console.log("Deploying contracts with the deployer account:", deployer.address);
     // checking the balance in the deployer account
     console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
@@ -91,7 +111,7 @@ async function setupBag() {
     // WETH
     // nonfungiblePositionManager Uniswap v3
     // _swapRouter Uniswap V3
-    const WETH_target = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9";
+    const WETH_target = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
     const nonfungiblePositionManager_target = "0x1238536071E1c677A632429e3655c799b22cDA52";
     const swaprouter_target = "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E";
 
@@ -105,7 +125,7 @@ async function setupBag() {
     // deploying the contracts
     ProtocolRewards = await protocolrewards.deploy();
     BondingCurve = await bondingcurve.deploy();
-    BagTokenImpl = await bagtokencontract.deploy(deployer.address,ProtocolRewards.target,WETH_target,nonfungiblePositionManager_target, swaprouter_target);
+    BagTokenImpl = await bagtokencontract.deploy(deployer.address, ProtocolRewards.target, WETH_target, nonfungiblePositionManager_target, swaprouter_target);
     BagFactoryImpl = await bagfactoryimpl.deploy(BagTokenImpl.target, BondingCurve.target);
 
     // Encode the initialization parameters
@@ -115,20 +135,20 @@ async function setupBag() {
 }
 
 async function deployAgent() {
-        const eth_value = ethers.parseEther("0.01");
-        console.log("Bag Factory Implementation target:", BagFactoryImpl.target);
-        const tx = await BagFactoryImpl.deploy(deployer.address, deployer.address, ",,","Test","TT", {value: eth_value});
-         // Wait for the transaction to be mined
-        const receipt = await tx.wait();
-        const event = receipt.logs.find(log => 
-            log.topics[0] === ethers.id("BagTokenCreated(address,address,address,address,address,string,string,string,address,address)")
-        );
-        const decodedEvent = BagFactoryImpl.interface.parseLog(event);
-        const deployedTokenAddress = decodedEvent.args[8]; // token address is the 9th parameter
-        
-        console.log("Deployed Bag Token Address:", deployedTokenAddress);
-        // attaching deployed bag token object
-        const bagtokencontract = await ethers.getContractFactory("Bag");
-        deployedToken = bagtokencontract.attach(deployedTokenAddress);
-        console.log("Bag Token Creator:", await deployedToken.tokenCreator())
+    const eth_value = ethers.parseEther("0.01");
+    console.log("Bag Factory Implementation target:", BagFactoryImpl.target);
+    const tx = await BagFactoryImpl.deploy(deployer.address, deployer.address, ",,", "Test", "TT", { value: eth_value, gasLimit: 10000000 });
+    // Wait for the transaction to be mined
+    const receipt = await tx.wait();
+    const event = receipt.logs.find(log =>
+        log.topics[0] === ethers.id("BagTokenCreated(address,address,address,address,address,string,string,string,address,address)")
+    );
+    const decodedEvent = BagFactoryImpl.interface.parseLog(event);
+    const deployedTokenAddress = decodedEvent.args[8]; // token address is the 9th parameter
+
+    console.log("Deployed Bag Token Address:", deployedTokenAddress);
+    // attaching deployed bag token object
+    const bagtokencontract = await ethers.getContractFactory("Bag");
+    deployedToken = bagtokencontract.attach(deployedTokenAddress);
+    console.log("Bag Token Creator:", await deployedToken.tokenCreator())
 }
