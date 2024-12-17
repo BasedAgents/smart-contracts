@@ -37,7 +37,8 @@ module.exports = {
 			url: secret.url,
 			accounts: [
 				// YOUR PRIVATE KEY HERE
-				secret.key
+				secret.key,
+				secret.test
 			  ]
 		},
 },
