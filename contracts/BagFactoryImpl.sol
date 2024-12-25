@@ -6,9 +6,10 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
-
+import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
 import {IBagFactory} from "./interfaces/IBagFactory.sol";
 import {Bag} from "./Bag.sol";
+import {BagGovernor} from "./BagGovernor.sol";
 
 /* 
     !!!         !!!         !!!    
@@ -23,9 +24,11 @@ import {Bag} from "./Bag.sol";
 contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address public immutable tokenImplementation;
     address public immutable bondingCurve;
+    address public immutable governorImplementation;
 
-    constructor(address _tokenImplementation, address _bondingCurve) initializer {
+    constructor(address _tokenImplementation,address _governorImplementation, address _bondingCurve) initializer {
         tokenImplementation = _tokenImplementation;
+        governorImplementation = _governorImplementation;
         bondingCurve = _bondingCurve;
     }
 
@@ -40,28 +43,59 @@ contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradea
         address _platformReferrer,
         string memory _tokenURI,
         string memory _name,
-        string memory _symbol
-    ) external payable nonReentrant returns (address) {
-        bytes32 salt = _generateSalt(_tokenCreator, _tokenURI);
+        string memory _symbol,
+        uint48 _votingDelay,
+        uint32 _votingPeriod,
+        uint256 _proposalThreshold
+    ) external payable nonReentrant returns (address token, address governor) {
+        bytes32 tokenSalt = _generateSalt(_tokenCreator, _tokenURI);
 
-        Bag token = Bag(payable(Clones.cloneDeterministic(tokenImplementation, salt)));
+        token = address(Clones.cloneDeterministic(tokenImplementation, tokenSalt));
+        
+        Bag(payable(token)).initialize{value: msg.value}(
+            _tokenCreator,
+            _platformReferrer,
+            bondingCurve,
+            _tokenURI,
+            _name,
+            _symbol
+        );
 
-        token.initialize{value: msg.value}(_tokenCreator, _platformReferrer, bondingCurve, _tokenURI, _name, _symbol);
+
+         bytes32 governorSalt = keccak256(abi.encodePacked(tokenSalt, "governor"));
+        governor = address(Clones.cloneDeterministic(governorImplementation, governorSalt));
+        
+        BagGovernor(payable(governor)).initialize(
+            IVotesUpgradeable(token),
+            _tokenCreator,
+            _votingDelay,
+            _votingPeriod,
+            _proposalThreshold
+        );
 
         emit BagTokenCreated(
             address(this),
             _tokenCreator,
             _platformReferrer,
-            token.protocolFeeRecipient(),
+            Bag(payable(token)).protocolFeeRecipient(),
             bondingCurve,
             _tokenURI,
             _name,
             _symbol,
             address(token),
-            token.poolAddress()
+            Bag(payable(token)).poolAddress()
         );
 
-        return address(token);
+        emit GovernorCreated(
+            token,
+            governor,
+            _tokenCreator,
+            _votingDelay,
+            _votingPeriod,
+            _proposalThreshold
+        );
+
+        return (token,governor);
     }
 
     /// @dev Generates a unique salt for deterministic deployment

@@ -36,6 +36,15 @@ interface IBagFactory {
         address poolAddress
     );
 
+    event GovernorCreated(
+        address indexed token,
+        address indexed governor,
+        address indexed tokenCreator,
+        uint48 votingDelay,
+        uint32 votingPeriod,
+        uint256 proposalThreshold
+    );
+
     /// @notice Deploys a Bag ERC20 token
     /// @param _tokenCreator The address of the token creator
     /// @param _platformReferrer The address of the platform referrer
@@ -47,6 +56,9 @@ interface IBagFactory {
         address _platformReferrer,
         string memory _tokenURI,
         string memory _name,
-        string memory _symbol
-    ) external payable returns (address);
+        string memory _symbol,
+        uint48 _votingDelay,
+        uint32 _votingPeriod,
+        uint256 _proposalThreshold
+    ) external payable returns (address token, address governance);
 }

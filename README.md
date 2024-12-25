@@ -1,15 +1,18 @@
 ## Current deployed addresses:
 These addresses can be found on the Sepolia Testnet:
 
-Protocol Rewards Contract address: 0x9EAE1234A4a26c5bFD778e1533796dE2cF7352B1
+Protocol Rewards Contract address: 0xb2ae29742A350F924b870E4aDBAbb967f5DeE8d4
 
-Bonding Curve address 0x021aE16F7AA807b3cC96625CC30Ae40FcA374bc0
+Bonding Curve address 0xe6835433f9a95E12128754168D117696a42Ea372
 
-Bag Token address: 0x7cDe2C49728F3c57e53BbF635D80ab7D59BF5632
+Bag Token address: 0xCafEb3Dd19F644F06023C9064F8fd1f87Ac95e0A
 
-Bag Factory Implementation address: 0x9C98056141FC87e70100f7046FD1B22729d907e2
+Bag Governance address: 0xBEf7BF7CB7dAd814F8e3e27D47B973514F78F616
 
-BagFactory address: 0x8DA85B822aC8767F6A987F0A662039734CC4f066
+Bag Factory Implementation address: 0x200F3DD6A459FCd5314498CCe2A3B4E9D2e2e391
+
+BagFactory address: 0x2bD6Dee3BfD167bC48D017604e8c6Efa1A0Be3e9
+
 
 
 All contracts are verified.

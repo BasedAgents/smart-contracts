@@ -26,12 +26,14 @@ async function main() {
     const bagtokencontract = await ethers.getContractFactory("Bag");
     const bagfactoryimpl = await ethers.getContractFactory("BagFactoryImpl");
     const bagfactory = await ethers.getContractFactory("BagFactory");
+    const baggovernanceimpl = await ethers.getContractFactory("BagGovernorImpl");
 
     // deploying the contracts
     const ProtocolRewards = await protocolrewards.deploy();
     const BondingCurve = await bondingcurve.deploy();
     const BagTokenImpl = await bagtokencontract.deploy(protocol_fee_recipient,ProtocolRewards.target,WETH_target,nonfungiblePositionManager_target, swaprouter_target);
-    const BagFactoryImpl = await bagfactoryimpl.deploy(BagTokenImpl.target, BondingCurve.target);
+    const BagGovernorImpl = await baggovernanceimpl.deploy();
+    const BagFactoryImpl = await bagfactoryimpl.deploy(BagTokenImpl.target,BagGovernorImpl.target, BondingCurve.target);
 
     // Encode the initialization parameters
     const initializeData = bagfactoryimpl.interface.encodeFunctionData("initialize", [protocol_fee_recipient]);
@@ -42,9 +44,9 @@ async function main() {
     console.log("Protocol Rewards Contract address:", ProtocolRewards.target);
     console.log("Bonding Curve address", BondingCurve.target);
     console.log("Bag Token address:", BagTokenImpl.target);
+    console.log("Bag Governance address:", BagGovernorImpl.target);
     console.log("Bag Factory Implementation address:", BagFactoryImpl.target);
     console.log("BagFactory address:", BagFactory.target);
-    console.log("Bag Governance address:", BagGovernor.target);
 }
 
 main()

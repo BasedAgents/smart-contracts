@@ -37,4 +37,5 @@ ignition/deployments/chain-31337
 secret.json
 artifacts/
 .states/
+.openzeppelin/
 

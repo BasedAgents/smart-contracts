@@ -8,48 +8,62 @@ import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesU
 import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract BagGovernor is 
+contract BagGovernorImpl is 
     Initializable,
     GovernorUpgradeable, 
     GovernorSettingsUpgradeable, 
     GovernorCountingSimpleUpgradeable, 
     GovernorVotesUpgradeable,
     GovernorVotesQuorumFractionUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
-
+    /// @dev Token creator address that has exclusive proposal rights
     address public tokenCreator;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    /// @notice Initializes the governance contract with required parameters
+    /// @param _token The ERC20 token that will be used for voting
+    /// @param _tokenCreator Address that will have exclusive proposal rights
+    /// @param _votingDelay Time between proposal creation and voting start
+    /// @param _votingPeriod Duration of voting
+    /// @param _proposalThreshold Minimum tokens required to create a proposal
     function initialize(
         IVotesUpgradeable _token, 
         address _tokenCreator,
-        uint48 _votingDelay,      // e.g. 1 block
-        uint32 _votingPeriod,     // e.g. 45818 blocks (~ 1 week)
-        uint256 _proposalThreshold // e.g. 0 tokens
-    ) initializer public {
+        uint48 _votingDelay,
+        uint32 _votingPeriod,
+        uint256 _proposalThreshold
+    ) external initializer {
         __Governor_init("BagGovernor");
         __GovernorSettings_init(
-            _votingDelay,     // initial voting delay 
-            _votingPeriod,    // initial voting period
-            _proposalThreshold // initial proposal threshold
+            _votingDelay,
+            _votingPeriod,
+            _proposalThreshold
         );
         __GovernorCountingSimple_init();
         __GovernorVotes_init(_token);
         __GovernorVotesQuorumFraction_init(10); // 10% quorum
         __Ownable_init(_tokenCreator);
+        __UUPSUpgradeable_init();
 
         tokenCreator = _tokenCreator;
     }
 
-    // Override propose function to restrict proposal creation
+    /// @notice Creates a proposal - restricted to token creator
+    /// @dev Overrides the standard propose function to add access control
     function propose(
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
     ) public virtual override returns (uint256) {
-        // Only token creator can create proposals
         require(
             msg.sender == tokenCreator, 
             "BagGovernor: Only token creator can create proposals"
@@ -58,7 +72,7 @@ contract BagGovernor is
         return super.propose(targets, values, calldatas, description);
     }
 
-    // The following functions are overrides required by Solidity.
+    // Required overrides for the governance functionality
     function votingDelay()
         public
         view
@@ -86,7 +100,11 @@ contract BagGovernor is
         return super.proposalThreshold();
     }
 
-    // Optional: Add function to update governance parameters
+    /// @notice Updates key governance parameters
+    /// @dev Only callable by contract owner (token creator)
+    /// @param _votingDelay New voting delay
+    /// @param _votingPeriod New voting period
+    /// @param _proposalThreshold New proposal threshold
     function updateGovernanceParameters(
         uint48 _votingDelay,
         uint32 _votingPeriod,
@@ -95,5 +113,14 @@ contract BagGovernor is
         _setVotingDelay(_votingDelay);
         _setVotingPeriod(_votingPeriod);
         _setProposalThreshold(_proposalThreshold);
+    }
+
+    /// @dev Required override for UUPS upgradeable pattern
+    /// @param newImplementation Address of new implementation
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+    /// @notice Returns current implementation address
+    function implementation() external view returns (address) {
+        return ERC1967Utils.getImplementation();
     }
 }
