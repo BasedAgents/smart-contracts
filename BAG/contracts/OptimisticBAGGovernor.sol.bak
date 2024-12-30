@@ -1,0 +1,258 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.21;
+
+import "@openzeppelin/contracts-upgradeable/governance/GovernorUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorSettingsUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorCountingSimpleUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+
+contract OptimisticBAGGovernor is 
+    Initializable,
+    GovernorUpgradeable,
+    GovernorSettingsUpgradeable,
+    GovernorCountingSimpleUpgradeable,
+    GovernorVotesUpgradeable,
+    GovernorVotesQuorumFractionUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable,
+    ReentrancyGuardUpgradeable
+{
+    ERC20VotesUpgradeable public token;
+    address public aiAgent;
+    uint256 public dailyLimit;
+    uint256 public timeLock;
+    uint256 public dailySpent;
+    uint256 public lastResetTimestamp;
+    uint256 public guardianEpochDuration; // in blocks
+    uint256 public currentEpochStartBlock;
+    address[3] public currentGuardians;
+    
+    event GuardiansUpdated(address[3] newGuardians, uint256 epochStartBlock);
+
+    struct HighValueTx {
+        address to;
+        uint256 amount;
+        uint64 startTime;
+        uint64 unlockTime;
+        bool executed;
+        bool canceled;
+        address[3] guardians;
+    }
+
+    mapping(uint256 => HighValueTx) public highValueTxs;
+    uint256 public nextTxId;
+
+    event HighValueTxScheduled(uint256 indexed txId, address indexed scheduler, address to, uint256 amount, address[3] guardians, uint64 startTime, uint64 unlockTime);
+    event HighValueTxExecuted(uint256 indexed txId, address to, uint256 amount);
+    event HighValueTxVetoed(uint256 indexed txId, address indexed guardian);
+    event LowValueSpendExecuted(address indexed executor, address to, uint256 amount);
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
+        ERC20VotesUpgradeable _token,
+        address _aiAgent,
+        uint256 _dailyLimit,
+        uint256 _timeLock,
+        uint256 _guardianEpochDuration
+    ) initializer public {
+        require(_aiAgent != address(0), "Invalid AI agent address");
+        
+        __Governor_init("OptimisticBAGGovernor");
+        __GovernorSettings_init(
+            5 minutes,     // voting delay
+            10 minutes,    // voting period
+            0             // proposal threshold set to 0 since only AI can propose
+        );
+        __GovernorCountingSimple_init();
+        __GovernorVotes_init(_token);
+        __GovernorVotesQuorumFraction_init(4);
+        __Ownable_init(msg.sender);
+        __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
+        
+        token = _token;
+        aiAgent = _aiAgent;
+        dailyLimit = _dailyLimit;
+        timeLock = _timeLock;
+        guardianEpochDuration = _guardianEpochDuration;
+        lastResetTimestamp = block.timestamp;
+        currentEpochStartBlock = block.number;
+        _updateGuardians(); // Set initial guardians
+    }
+
+    modifier onlyAI() {
+        require(msg.sender == aiAgent, "Only AI agent can execute");
+        _;
+    }
+
+    function executeTransaction(address to, uint256 amount) external onlyAI nonReentrant {
+        if (block.timestamp - lastResetTimestamp >= 1 days) {
+            dailySpent = 0;
+            lastResetTimestamp = block.timestamp;
+        }
+
+        require(dailySpent + amount <= dailyLimit, "Exceeds daily limit");
+        dailySpent += amount;
+        
+        require(token.transfer(to, amount), "Transfer failed");
+        emit LowValueSpendExecuted(msg.sender, to, amount);
+    }
+
+    function scheduleHighValueTx(address to, uint256 amount) external onlyAI nonReentrant returns (uint256 txId) {
+        txId = nextTxId++;
+        
+        address[3] memory guardians = getCurrentGuardians();
+        uint64 start = uint64(block.timestamp);
+        uint64 unlock = uint64(start + timeLock);
+
+        highValueTxs[txId] = HighValueTx({
+            to: to,
+            amount: amount,
+            startTime: start,
+            unlockTime: unlock,
+            executed: false,
+            canceled: false,
+            guardians: guardians
+        });
+
+        emit HighValueTxScheduled(txId, msg.sender, to, amount, guardians, start, unlock);
+    }
+
+    function executeScheduled(uint256 txId) external nonReentrant {
+        HighValueTx storage hvt = highValueTxs[txId];
+        require(!hvt.canceled, "Transaction was vetoed");
+        require(!hvt.executed, "Already executed");
+        require(block.timestamp >= hvt.unlockTime, "Time lock not expired");
+
+        hvt.executed = true;
+        require(token.transfer(hvt.to, hvt.amount), "Transfer failed");
+        
+        emit HighValueTxExecuted(txId, hvt.to, hvt.amount);
+    }
+
+    function vetoTransaction(uint256 txId) external nonReentrant {
+        HighValueTx storage hvt = highValueTxs[txId];
+        require(!hvt.canceled && !hvt.executed, "Invalid transaction state");
+        require(_isGuardian(hvt.guardians, msg.sender), "Not a guardian");
+        
+        hvt.canceled = true;
+        emit HighValueTxVetoed(txId, msg.sender);
+    }
+
+    function updateGuardiansIfNeeded() public {
+        if (block.number >= currentEpochStartBlock + guardianEpochDuration) {
+            _updateGuardians();
+        }
+    }
+
+    function _updateGuardians() internal {
+        currentGuardians = _getTopDelegates();
+        currentEpochStartBlock = block.number;
+        emit GuardiansUpdated(currentGuardians, currentEpochStartBlock);
+    }
+
+    function getCurrentGuardians() public view returns (address[3] memory) {
+        return currentGuardians;
+    }
+
+    function _getTopDelegates() internal view returns (address[3] memory) {
+        // Get total token supply
+        uint256 totalSupply = token.totalSupply();
+        
+        // Array to store top delegates and their voting power
+        address[20] memory topAddresses;
+        uint256[20] memory topVotingPowers;
+        uint256 minTopPower;
+        
+        // Scan delegate events to build top delegates list
+        // We need to track more than 3 to handle duplicates/zeros
+        uint256 blockStart = currentEpochStartBlock - guardianEpochDuration;
+        uint256 blockEnd = currentEpochStartBlock;
+        
+        bytes32 DELEGATE_TYPEHASH = keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
+        
+        for (uint256 i = blockStart; i < blockEnd; i++) {
+            // Get delegates from events at this block
+            bytes memory eventsData = token.delegateCheckpoint(i);
+            if (eventsData.length > 0) {
+                (address delegate, uint256 votes) = abi.decode(eventsData, (address, uint256));
+                
+                if (votes > minTopPower) {
+                    // Insert into sorted array
+                    for (uint256 j = 0; j < 20; j++) {
+                        if (votes > topVotingPowers[j]) {
+                            // Shift elements down
+                            for (uint256 k = 19; k > j; k--) {
+                                topAddresses[k] = topAddresses[k-1];
+                                topVotingPowers[k] = topVotingPowers[k-1];
+                            }
+                            // Insert new element
+                            topAddresses[j] = delegate;
+                            topVotingPowers[j] = votes;
+                            minTopPower = topVotingPowers[19];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Return top 3 unique non-zero addresses
+        address[3] memory result;
+        uint256 resultIndex;
+        
+        for (uint256 i = 0; i < 20 && resultIndex < 3; i++) {
+            address candidate = topAddresses[i];
+            if (candidate != address(0) && !_isDuplicateGuardian(result, candidate)) {
+                result[resultIndex++] = candidate;
+            }
+        }
+        
+        return result;
+    }
+    
+    function _isDuplicateGuardian(address[3] memory guardians, address candidate) internal pure returns (bool) {
+        for (uint256 i = 0; i < guardians.length; i++) {
+            if (guardians[i] == candidate) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function _isGuardian(address[3] memory guardians, address account) internal pure returns (bool) {
+        for (uint i = 0; i < 3; i++) {
+            if (guardians[i] == account) return true;
+        }
+        return false;
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+    // Required overrides
+    function votingDelay() public view override(GovernorUpgradeable, GovernorSettingsUpgradeable) returns (uint256) {
+        return super.votingDelay();
+    }
+
+    function votingPeriod() public view override(GovernorUpgradeable, GovernorSettingsUpgradeable) returns (uint256) {
+        return super.votingPeriod();
+    }
+
+    function quorum(uint256 blockNumber) public view override(GovernorUpgradeable, GovernorVotesQuorumFractionUpgradeable) returns (uint256) {
+        return super.quorum(blockNumber);
+    }
+
+    function proposalThreshold() public view override(GovernorUpgradeable, GovernorSettingsUpgradeable) returns (uint256) {
+        return super.proposalThreshold();
+    }
+}
