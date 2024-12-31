@@ -13,7 +13,7 @@ async function main() {
   //    Pass parameters for `initialize(...)`: _name, _symbol, _owner
   const bagToken = await upgrades.deployProxy(
     BAGTokenFactory,
-    ["BAG Token", "BAG", "0x552375B8BC807F30065Dca9A5828B645D64F53Ab"], // Adjust the owner
+    ["BAG Token", "BAG", "0x915E602d1e8960218C54D05f214eDDf5D875d80d"], // Updated owner address
     {
       initializer: "initialize",
       kind: "uups",
@@ -35,7 +35,7 @@ async function main() {
   console.log("Initial supply is:", ethers.formatUnits(supply, 18), "BAG");
 
   console.log("\nVerification command:");
-  console.log(`npx hardhat verify --network baseSepolia ${await upgrades.erc1967.getImplementationAddress(bagTokenAddress)}`);
+  console.log(`npx hardhat verify --network base ${await upgrades.erc1967.getImplementationAddress(bagTokenAddress)}`);
 }
 
 main().catch((error) => {

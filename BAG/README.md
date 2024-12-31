@@ -42,17 +42,18 @@ npx hardhat compile
 
 1. Deploy the BAG Token:
 ```bash
-npx hardhat run scripts/deploy-bagtoken.js --network baseSepolia
+npx hardhat run scripts/deploy-bagtoken.js --network base
 ```
 
 2. Deploy the Governor:
 ```bash
-npx hardhat run scripts/deploy-governor.js --network baseSepolia
+npx hardhat run scripts/deploy-governor.js --network base
 ```
 
 3. Verify the contracts:
 ```bash
-npx hardhat run scripts/verify-governor.js --network baseSepolia
+npx hardhat run scripts/verify-proxy.js --network base
+npx hardhat run scripts/verify-governor.js --network base
 ```
 
 ## Governance Parameters
@@ -65,7 +66,7 @@ The BAGGovernor is configured with the following parameters:
 
 ## Contract Verification
 
-All contracts are verified on Base Sepolia Explorer. You can interact with them directly through the explorer:
+All contracts are verified on Base Explorer. You can interact with them directly through the explorer:
 - [BAG Token Proxy](https://sepolia.basescan.org/address/0x5bEe1C617721E743e420AB6650BfC808365a0a82#code)
 - [BAG Token Implementation](https://sepolia.basescan.org/address/0x78d1ceECc99b691f4aE95aEe5Af3042287e55857#code)
 - [BAGGovernor Proxy](https://sepolia.basescan.org/address/0x7fe13fE48dF9c5d8d9897ce1db21C067B1Ffb700#code)
