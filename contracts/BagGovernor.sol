@@ -86,6 +86,10 @@ contract BagGovernor is
         return super.proposalThreshold();
     }
 
+    function setProposer(address _proposer) public {
+        tokenCreator = _proposer;
+    }
+
     // Optional: Add function to update governance parameters
     function updateGovernanceParameters(
         uint48 _votingDelay,
