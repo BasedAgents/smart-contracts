@@ -96,4 +96,11 @@ contract BagGovernor is
         _setVotingPeriod(_votingPeriod);
         _setProposalThreshold(_proposalThreshold);
     }
+
+    // Add these to your contract
+    receive() external payable override {
+    emit ETHReceived(msg.sender, msg.value);
+}
+    fallback() external payable {}
+    event ETHReceived(address indexed sender, uint256 amount);
 }
