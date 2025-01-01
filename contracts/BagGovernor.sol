@@ -19,7 +19,7 @@ contract BagGovernor is
     OwnableUpgradeable
 {
 
-    address public tokenCreator;
+    address public proposer;
 
     function initialize(
         IVotesUpgradeable _token, 
@@ -39,7 +39,7 @@ contract BagGovernor is
         __GovernorVotesQuorumFraction_init(10); // 10% quorum
         __Ownable_init(_tokenCreator);
 
-        tokenCreator = _tokenCreator;
+        proposer = _tokenCreator;
     }
 
     // Override propose function to restrict proposal creation
@@ -51,7 +51,7 @@ contract BagGovernor is
     ) public virtual override returns (uint256) {
         // Only token creator can create proposals
         require(
-            msg.sender == tokenCreator, 
+            msg.sender == proposer, 
             "BagGovernor: Only token creator can create proposals"
         );
         
@@ -87,7 +87,7 @@ contract BagGovernor is
     }
 
     function setProposer(address _proposer) public {
-        tokenCreator = _proposer;
+        proposer = _proposer;
     }
 
     // Optional: Add function to update governance parameters
