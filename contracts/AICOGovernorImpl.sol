@@ -10,7 +10,17 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract BagGovernorImpl is 
+/* 
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+
+    AICO        AICO        AICO    
+*/
+contract AICOGovernorImpl is 
     Initializable,
     GovernorUpgradeable, 
     GovernorSettingsUpgradeable, 
@@ -41,7 +51,7 @@ contract BagGovernorImpl is
         uint32 _votingPeriod,
         uint256 _proposalThreshold
     ) external initializer {
-        __Governor_init("BagGovernor");
+        __Governor_init("AICOGovernor");
         __GovernorSettings_init(
             _votingDelay,
             _votingPeriod,
@@ -66,7 +76,7 @@ contract BagGovernorImpl is
     ) public virtual override returns (uint256) {
         require(
             msg.sender == tokenCreator, 
-            "BagGovernor: Only token creator can create proposals"
+            "AICOGovernor: Only token creator can create proposals"
         );
         
         return super.propose(targets, values, calldatas, description);
@@ -123,4 +133,4 @@ contract BagGovernorImpl is
     function implementation() external view returns (address) {
         return ERC1967Utils.getImplementation();
     }
-}
+} 

@@ -9,7 +9,17 @@ import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQ
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract BagGovernor is 
+/* 
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+    !!!         !!!         !!!    
+
+    AICO        AICO        AICO    
+*/
+contract AICOGovernor is 
     Initializable,
     GovernorUpgradeable, 
     GovernorSettingsUpgradeable, 
@@ -18,7 +28,6 @@ contract BagGovernor is
     GovernorVotesQuorumFractionUpgradeable,
     OwnableUpgradeable
 {
-
     address public tokenCreator;
 
     function initialize(
@@ -28,7 +37,7 @@ contract BagGovernor is
         uint32 _votingPeriod,     // e.g. 45818 blocks (~ 1 week)
         uint256 _proposalThreshold // e.g. 0 tokens
     ) initializer public {
-        __Governor_init("BagGovernor");
+        __Governor_init("AICOGovernor");
         __GovernorSettings_init(
             _votingDelay,     // initial voting delay 
             _votingPeriod,    // initial voting period
@@ -52,7 +61,7 @@ contract BagGovernor is
         // Only token creator can create proposals
         require(
             msg.sender == tokenCreator, 
-            "BagGovernor: Only token creator can create proposals"
+            "AICOGovernor: Only token creator can create proposals"
         );
         
         return super.propose(targets, values, calldatas, description);
@@ -96,4 +105,4 @@ contract BagGovernor is
         _setVotingPeriod(_votingPeriod);
         _setProposalThreshold(_proposalThreshold);
     }
-}
+} 

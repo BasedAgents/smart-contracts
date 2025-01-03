@@ -7,9 +7,9 @@ import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/ut
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
-import {IBagFactory} from "./interfaces/IBagFactory.sol";
-import {Bag} from "./Bag.sol";
-import {BagGovernor} from "./BagGovernor.sol";
+import {IAICOFactory} from "./interfaces/IAICOFactory.sol";
+import {AICO} from "./AICO.sol";
+import {AICOGovernor} from "./AICOGovernor.sol";
 
 /* 
     !!!         !!!         !!!    
@@ -18,21 +18,21 @@ import {BagGovernor} from "./BagGovernor.sol";
     !!!         !!!         !!!    
     !!!         !!!         !!!    
     !!!         !!!         !!!    
- 
-    BAG         BAG         BAG    
+
+    AICO        AICO        AICO    
 */
-contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
+contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address public immutable tokenImplementation;
     address public immutable bondingCurve;
     address public immutable governorImplementation;
 
-    constructor(address _tokenImplementation,address _governorImplementation, address _bondingCurve) initializer {
+    constructor(address _tokenImplementation, address _governorImplementation, address _bondingCurve) initializer {
         tokenImplementation = _tokenImplementation;
         governorImplementation = _governorImplementation;
         bondingCurve = _bondingCurve;
     }
 
-    /// @notice Creates a Bag token with bonding curve mechanics that graduates to Uniswap V3
+    /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V3
     /// @param _tokenCreator The address of the token creator
     /// @param _platformReferrer The address of the platform referrer
     /// @param _tokenURI The ERC20z token URI
@@ -52,7 +52,7 @@ contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradea
 
         token = address(Clones.cloneDeterministic(tokenImplementation, tokenSalt));
         
-        Bag(payable(token)).initialize{value: msg.value}(
+        AICO(payable(token)).initialize{value: msg.value}(
             _tokenCreator,
             _platformReferrer,
             bondingCurve,
@@ -61,11 +61,10 @@ contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradea
             _symbol
         );
 
-
-         bytes32 governorSalt = keccak256(abi.encodePacked(tokenSalt, "governor"));
+        bytes32 governorSalt = keccak256(abi.encodePacked(tokenSalt, "governor"));
         governor = address(Clones.cloneDeterministic(governorImplementation, governorSalt));
         
-        BagGovernor(payable(governor)).initialize(
+        AICOGovernor(payable(governor)).initialize(
             IVotesUpgradeable(token),
             _tokenCreator,
             _votingDelay,
@@ -73,17 +72,17 @@ contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradea
             _proposalThreshold
         );
 
-        emit BagTokenCreated(
+        emit AICOTokenCreated(
             address(this),
             _tokenCreator,
             _platformReferrer,
-            Bag(payable(token)).protocolFeeRecipient(),
+            AICO(payable(token)).protocolFeeRecipient(),
             bondingCurve,
             _tokenURI,
             _name,
             _symbol,
             address(token),
-            Bag(payable(token)).poolAddress()
+            AICO(payable(token)).poolAddress()
         );
 
         emit GovernorCreated(
@@ -95,7 +94,7 @@ contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradea
             _proposalThreshold
         );
 
-        return (token,governor);
+        return (token, governor);
     }
 
     /// @dev Generates a unique salt for deterministic deployment
@@ -132,4 +131,4 @@ contract BagFactoryImpl is IBagFactory, UUPSUpgradeable, ReentrancyGuardUpgradea
     /// @dev Authorizes an upgrade to a new implementation
     /// @param _newImpl The new implementation address
     function _authorizeUpgrade(address _newImpl) internal override onlyOwner {}
-}
+} 
