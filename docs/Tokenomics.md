@@ -1,148 +1,101 @@
-# AICO Protocol Tokenomics
+# BasedAgents Protocol Tokenomics
 
-## Governance Control
-Parameters can be modified through two authorized entities:
-1. Token Creator (set as owner during token initialization)
-   - This is the address that creates the token through the factory
-   - Has full control over their specific AICO token instance
-   - Can update parameters and set governance contract
-2. Governance Contract (can be set/updated by token creator)
-   - Separate contract that can be given parameter update rights
-   - Set via `setGovernanceContract` by token creator
-   - Can be updated or revoked by token creator
+## Core Token: $BAG
 
-### Governance Setup
-- Owner can set/update governance contract address via `setGovernanceContract`
-- Both owner and governance contract can call parameter update functions
-- Governance contract address cannot be zero address
-- Changes tracked via `GovernanceContractUpdated` event
+### Overview
+The BAG token is the native token of the BasedAgents ecosystem, powering the entire protocol through three core functions:
+1. Agent Token Creation & Trading
+2. Protocol Governance
+3. Value Accrual through Protocol Fees
 
-## Parameter Modification Rights
+### Total Supply and Distribution
+- Total Supply: 1,000,000,000 BAG (1B tokens)
+- Distribution:
+  - Based Agents DAO / Genesis Agent: 35% (350M BAG)
+    - Initially managed by Community Multisig
+    - Progressive transition of functions to Genesis Agent
+  - Liquidity Providers: 35% (350M BAG)
+    - Ensures deep liquidity for protocol operations
+  - Ecosystem Fund (AI3 Agent): 30% (300M BAG)
+    - Supports ecosystem growth and development
 
-### Modifiable by Owner OR Governance Contract
-The following parameters can be updated via `upgradeParameters`:
-1. Supply Parameters:
-   - Maximum Total Supply (`MAX_TOTAL_SUPPLY`)
-   - Primary Market Supply (`PRIMARY_MARKET_SUPPLY`)
-   - Secondary Market Supply (`SECONDARY_MARKET_SUPPLY`)
+### Economic Model
 
-2. Fee Parameters:
-   - Total Fee BPS (`TOTAL_FEE_BPS`)
-   - Token Creator Fee BPS (`TOKEN_CREATOR_FEE_BPS`)
-   - Protocol Fee BPS (`PROTOCOL_FEE_BPS`)
-   - Platform Referrer Fee BPS (`PLATFORM_REFERRER_FEE_BPS`)
-   - Order Referrer Fee BPS (`ORDER_REFERRER_FEE_BPS`)
-   - Minimum Order Size (`MIN_ORDER_SIZE`)
-   - Graduation Fee (`graduationFee`)
+#### Agent Token Creation
+- New Agent tokens are launched through the AICO (AI Coin Offering) process
+- Each launch requires BAG tokens for:
+  - Token purchases through the bonding curve
+  - Transaction fees and graduation fees
+  - Initial liquidity provision
 
-3. Protocol Addresses (via `updateProtocolAddresses`):
-   - Protocol Fee Recipient
-   - Protocol Rewards Contract
-   - WETH Contract
-   - Nonfungible Position Manager
-   - Swap Router
-
-### Modifiable by Owner Only
-- Governance Contract Address (via `setGovernanceContract`)
-
-## Protocol Fee Recipient
-- Current Address: `0x973de1CDAce46ddF5904cF46cb96E6d039Ac75C2`
-- Modifiable through governance upgrade
-- Serves as:
-  - Default recipient for protocol fees (20% of total fees)
-  - Default recipient for platform referrer fees when no referrer specified
-  - Default recipient for order referrer fees when no referrer specified
-
-## Transaction Fees
-
-### Base Fee
-- Total Fee: 1% (100 BPS) of each transaction
-  - Mutable: Yes, via governance
-  - Parameter: `TOTAL_FEE_BPS`
-- Minimum Order Size: 0.0000001 BAG
-  - Mutable: Yes, via governance
-  - Parameter: `MIN_ORDER_SIZE`
-
-### Fee Distribution
-Total fee is split among four parties (all percentages mutable by AICO token owner via `upgradeParameters`):
-
-1. **Token Creator** (50% of total fee)
-   - BPS Value: 5000
-   - Parameter: `TOKEN_CREATOR_FEE_BPS`
-   - Recipient: `tokenCreator` (immutable after AICO deployment)
-   - Event ID: `AICO_CREATOR_FEE`
-
-2. **Protocol** (20% of total fee)
-   - BPS Value: 2000
-   - Parameter: `PROTOCOL_FEE_BPS`
-   - Recipient: `protocolFeeRecipient` (immutable after AICO deployment)
-   - Event ID: `AICO_PROTOCOL_FEE`
-
-3. **Platform Referrer** (15% of total fee)
-   - BPS Value: 1500
-   - Parameter: `PLATFORM_REFERRER_FEE_BPS`
-   - Recipient: `platformReferrer` (immutable after AICO deployment)
-   - Event ID: `AICO_PLATFORM_REFERRER_FEE`
-
-4. **Order Referrer** (15% of total fee)
-   - BPS Value: 1500
-   - Parameter: `ORDER_REFERRER_FEE_BPS`
-   - Recipient: Set per transaction, defaults to `protocolFeeRecipient`
-   - Event ID: `AICO_ORDER_REFERRER_FEE`
-
-## Market Graduation Fee
-- Amount: 525 BAG
-  - Mutable: Yes, via governance
-  - Parameter: `graduationFee`
-- Distribution: Same as transaction fees
-- Timing: One-time fee at market graduation
-
-## Supply Parameters
-All supply parameters mutable via governance:
-- Maximum Total Supply: 1,000,000,000 tokens (`MAX_TOTAL_SUPPLY`)
-- Primary Market Supply: 500,000,000 tokens (`PRIMARY_MARKET_SUPPLY`)
-- Secondary Market Supply: 200,000,000 tokens (`SECONDARY_MARKET_SUPPLY`)
-- Agent Allocation: 300,000,000 tokens (`AGENT_ALLOCATION`)
-
-## Bonding Curve Parameters
-Bonding curve uses formula `y = A*e^(Bx)` where:
-- A = 1.06 BAG (initial price coefficient)
-  - Immutable after deployment
-  - Set in BondingCurve contract constructor
-- B = 0.023 (exponential growth rate)
-  - Immutable after deployment
-  - Set in BondingCurve contract constructor
-
-Price progression (determined by immutable A and B parameters):
+#### Bonding Curve Mechanism
+- Smart contract automatically prices tokens based on supply and demand
+- Uses formula `y = A*e^(Bx)` for predictable price discovery
 - Initial price: 1.06 BAG
-- At 100M tokens: ~10.2 BAG
-- At 250M tokens: ~98.5 BAG
-- At 500M tokens: ~4,634.21 BAG
-Total BAG required: 42,000 BAG
+- Final price at graduation: ~4,634.21 BAG
+- Total BAG required for graduation: 42,000 BAG
 
-## Fee Management
-- Collection: All fees processed through `_disperseFees` function
-- Storage: Fees held in ProtocolRewards contract
-- Modification: 
-  - All BPS values can be updated by AICO token owner
-  - Fee recipient addresses are immutable after deployment
-  - Changes require `upgradeParameters` function call
-- Events: All fee distributions tracked via `BagTokenFees` events
+#### Market Graduation
+When an Agent token accumulates 42,000 BAG through the bonding curve:
+1. Graduation fee of 525 BAG is paid
+2. Automatic Uniswap V2 pool creation
+3. Initial liquidity provision with collected BAG
+4. Transition from bonding curve to open market trading
 
-## Parameter Update Process
-1. Governance proposal created
-2. Community voting period
-3. If approved:
-   - For parameter updates: `upgradeParameters` function called
-   - For contract upgrades: Upgrade process initiated
-4. Events emitted:
-   - `TokenParametersUpdated` for supply changes
-   - `GraduationFeeUpdated` for graduation fee changes
-   - Additional events for governance actions
+### Value Accrual Mechanisms
 
-## Governance Upgrade Process
-The ability to modify these parameters can be transferred to:
-1. Community multisig
-2. BasedAgents DAO
-3. Any future governance mechanism
-through appropriate contract upgrades approved by token holders. 
+#### 1. Transaction Fees
+All Agent token transactions incur a 1% fee in BAG, distributed to:
+- Token Creator: 50% (5000 BPS)
+- Protocol Treasury: 20% (2000 BPS)
+- Platform Referrer: 15% (1500 BPS)
+- Order Referrer: 15% (1500 BPS)
+
+#### 2. Graduation Fees
+525 BAG fee upon market graduation, following the same distribution as transaction fees
+
+#### 3. Protocol Growth
+- Each new Agent token launch increases BAG utility
+- Successful Agent tokens drive more trading volume and fees
+- Network effects strengthen the BAG token ecosystem
+
+### Economic Incentives
+
+#### For Token Creators
+- Revenue share from all token transactions (50% of fees)
+- Control over token parameters and governance
+- Ability to build and monetize AI Agent communities
+
+#### For Early Supporters
+- Access to Agent tokens at bonding curve prices
+- Potential for value appreciation through graduation process
+- Participation in Agent governance
+
+#### For Traders
+- Liquid markets through bonding curve pre-graduation
+- Automated market making via Uniswap post-graduation
+- Multiple trading opportunities across market phases
+
+## Agent Token Specification
+
+### Market Phases
+1. **Primary Market (Bonding Curve)**
+   - Supply: 500M tokens
+   - Price: Determined by bonding curve
+   - Trading: Against BAG tokens
+
+2. **Graduation**
+   - Requirement: 42,000 BAG accumulated
+   - Fee: 525 BAG
+   - Action: Uniswap V2 pool creation
+
+3. **Secondary Market (Uniswap)**
+   - Supply: 200M tokens
+   - Price: Market determined
+   - Trading: Open market on Uniswap V2
+
+### Supply Parameters
+- Maximum Total Supply: 1,000,000,000 tokens (1B)
+- Primary Market Supply: 500,000,000 tokens (500M)
+- Secondary Market Supply: 200,000,000 tokens (200M)
+- Agent Allocation: 300,000,000 tokens (300M) 
