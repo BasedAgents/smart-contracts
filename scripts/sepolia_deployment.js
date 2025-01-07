@@ -16,7 +16,7 @@ async function main() {
     // WETH
     // nonfungiblePositionManager Uniswap v3
     // _swapRouter Uniswap V3
-    const WETH_target = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9";
+    const BAG_TOKEN = "0xCafEb3Dd19F644F06023C9064F8fd1f87Ac95e0A";
     const nonfungiblePositionManager_target = "0x1238536071E1c677A632429e3655c799b22cDA52";
     const swaprouter_target = "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E";
 
@@ -30,8 +30,14 @@ async function main() {
 
     // deploying the contracts
     const ProtocolRewards = await protocolrewards.deploy();
-    const BondingCurve = await bondingcurve.deploy();
-    const BagTokenImpl = await bagtokencontract.deploy(protocol_fee_recipient,ProtocolRewards.target,WETH_target,nonfungiblePositionManager_target, swaprouter_target);
+    const BondingCurve = await bondingcurve.deploy(BAG_TOKEN);
+    const BagTokenImpl = await bagtokencontract.deploy(
+        protocol_fee_recipient,
+        ProtocolRewards.target,
+        BAG_TOKEN,
+        nonfungiblePositionManager_target,
+        swaprouter_target
+    );
     const BagGovernorImpl = await baggovernanceimpl.deploy();
     const BagFactoryImpl = await bagfactoryimpl.deploy(BagTokenImpl.target,BagGovernorImpl.target, BondingCurve.target);
 
@@ -48,6 +54,9 @@ async function main() {
     console.log("Bag Factory Implementation address:", BagFactoryImpl.target);
     console.log("BagFactory address:", BagFactory.target);
 }
+
+// Add BAG token address
+const BAG_TOKEN = "0xCafEb3Dd19F644F06023C9064F8fd1f87Ac95e0A";
 
 main()
     .then(() => process.exit(0))
