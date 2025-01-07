@@ -89,8 +89,22 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         string memory _tokenURI,
         string memory _name,
         string memory _symbol
-    ) external payable initializer {
+    ) public payable initializer {
         // ... rest of the initialization code ...
+
+        // Initialize constants as storage variables
+        MAX_TOTAL_SUPPLY = 1_000_000_000e18; // 1B tokens
+        PRIMARY_MARKET_SUPPLY = 800_000_000e18; // 800M tokens
+        SECONDARY_MARKET_SUPPLY = 200_000_000e18; // 200M tokens
+        TOTAL_FEE_BPS = 100; // 1%
+        TOKEN_CREATOR_FEE_BPS = 5000; // 50% (of TOTAL_FEE_BPS)
+        PROTOCOL_FEE_BPS = 2000; // 20% (of TOTAL_FEE_BPS)
+        PLATFORM_REFERRER_FEE_BPS = 1500; // 15% (of TOTAL_FEE_BPS)
+        ORDER_REFERRER_FEE_BPS = 1500; // 15% (of TOTAL_FEE_BPS)
+        MIN_ORDER_SIZE = 0.0000001e18; // Minimum order size in BAG
+        graduationFee = 525e18; // Graduation fee in BAG (525 BAG)
+
+        // ... rest of initialization code ...
     }
 
     // ... rest of the contract functions with renamed references ...
