@@ -1,7 +1,14 @@
 {
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.15"
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@typechain/hardhat": "^9.0.0",
+    "hardhat": "^2.22.15",
+    "hardhat-gas-reporter": "^1.0.10",
+    "solidity-coverage": "^0.8.10"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.1.0",
@@ -12,5 +19,14 @@
     "hardhat-contract-sizer": "^2.10.0",
     "hardhat-deploy": "^0.14.0",
     "solady": "^0.0.267"
+  },
+  "overrides": {
+    "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/providers": "^5.7.0",
+    "ethers": "^6.11.1",
+    "ws": "^8.16.0",
+    "axios": "^1.6.7",
+    "cookie": "^0.7.0",
+    "elliptic": "^6.5.8"
   }
 }
