@@ -39,7 +39,14 @@ async function main() {
         swaprouter_target
     );
     const BagGovernorImpl = await baggovernanceimpl.deploy();
-    const BagFactoryImpl = await bagfactoryimpl.deploy(BagTokenImpl.target,BagGovernorImpl.target, BondingCurve.target);
+    const BagFactoryImpl = await bagfactoryimpl.deploy(
+        BagTokenImpl.target,
+        BagGovernorImpl.target, 
+        BondingCurve.target,
+        poolCreationSubsidy_target,
+        uniswapV2Factory_target,
+        BAG_TOKEN
+    );
 
     // Encode the initialization parameters
     const initializeData = bagfactoryimpl.interface.encodeFunctionData("initialize", [protocol_fee_recipient]);

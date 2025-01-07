@@ -10,6 +10,8 @@ import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/
 import {IAICOFactory} from "./interfaces/IAICOFactory.sol";
 import {AICO} from "./AICO.sol";
 import {AICOGovernor} from "./AICOGovernor.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 /* 
     !!!         !!!         !!!    
@@ -27,19 +29,23 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     address public immutable governorImplementation;
     address public immutable poolCreationSubsidy;
     address public immutable uniswapV2Factory;
+    uint256 public constant AGENT_CREATION_FEE = 100e18; // 100 BAG
+    IERC20 public immutable BAG;
 
     constructor(
         address _tokenImplementation, 
         address _governorImplementation, 
         address _bondingCurve,
         address _poolCreationSubsidy,
-        address _uniswapV2Factory
+        address _uniswapV2Factory,
+        address _bagToken
     ) initializer {
         tokenImplementation = _tokenImplementation;
         governorImplementation = _governorImplementation;
         bondingCurve = _bondingCurve;
         poolCreationSubsidy = _poolCreationSubsidy;
         uniswapV2Factory = _uniswapV2Factory;
+        BAG = IERC20(_bagToken);
     }
 
     /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V2
@@ -60,6 +66,9 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         uint32 _votingPeriod,
         uint256 _proposalThreshold
     ) external payable nonReentrant returns (address token, address governor) {
+        // Collect creation fee
+        require(BAG.transferFrom(msg.sender, protocolFeeRecipient, AGENT_CREATION_FEE), "Creation fee transfer failed");
+
         bytes32 tokenSalt = _generateSalt(_tokenCreator, _tokenURI);
 
         token = address(Clones.cloneDeterministic(tokenImplementation, tokenSalt));

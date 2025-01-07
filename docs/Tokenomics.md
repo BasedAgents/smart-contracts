@@ -24,6 +24,7 @@ The BAG token is the native token of the BasedAgents ecosystem, powering the ent
 #### Agent Token Creation
 - New Agent tokens are launched through the AICO (AI Coin Offering) process
 - Each launch requires BAG tokens for:
+  - Creation fee of 100 BAG paid to Protocol Treasury
   - Token purchases through the bonding curve
   - Transaction fees and graduation fees
   - Initial liquidity provision
@@ -44,17 +45,23 @@ When an Agent token accumulates 42,000 BAG through the bonding curve:
 
 ### Value Accrual Mechanisms
 
-#### 1. Transaction Fees
+#### 1. Agent Creation Fee
+- Amount: 100 BAG
+- Recipient: Protocol Treasury
+- Timing: One-time fee at Agent token creation
+- Purpose: Ensures quality Agent launches and supports protocol development
+
+#### 2. Transaction Fees
 All Agent token transactions incur a 1% fee in BAG, distributed to:
 - Token Creator: 50% (5000 BPS)
 - Protocol Treasury: 20% (2000 BPS)
 - Platform Referrer: 15% (1500 BPS)
 - Order Referrer: 15% (1500 BPS)
 
-#### 2. Graduation Fees
+#### 3. Graduation Fees
 525 BAG fee upon market graduation, following the same distribution as transaction fees
 
-#### 3. Protocol Growth
+#### 4. Protocol Growth
 - Each new Agent token launch increases BAG utility
 - Successful Agent tokens drive more trading volume and fees
 - Network effects strengthen the BAG token ecosystem
