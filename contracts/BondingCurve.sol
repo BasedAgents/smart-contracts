@@ -2,6 +2,7 @@
 pragma solidity ^0.8.23;
 
 import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /* 
     !!!         !!!         !!!    
@@ -11,7 +12,7 @@ import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
     !!!         !!!         !!!    
     !!!         !!!         !!!    
 
-    BAG         BAG         BAG    
+    AICO        AICO        AICO    
 */
 contract BondingCurve {
     using FixedPointMathLib for uint256;
@@ -19,12 +20,25 @@ contract BondingCurve {
 
     error InsufficientLiquidity();
 
+    IERC20 public immutable BAG;
+    
     // y = A*e^(Bx)
+    // A = ~1.06 BAG initial price
+    // B = 0.015 adjusted for 42k BAG total cost
+    // Price progression:
+    // At 0 tokens: 1.06 BAG
+    // At 100M tokens: ~4.24 BAG
+    // At 400M tokens: ~68.12 BAG
+    // At 800M tokens: ~4,634.21 BAG
     uint256 public immutable A = 1060848709;
-    uint256 public immutable B = 4379701787;
+    uint256 public immutable B = 15000000000;
 
-    function getEthSellQuote(uint256 currentSupply, uint256 ethOrderSize) external pure returns (uint256) {
-        uint256 deltaY = ethOrderSize;
+    constructor(address _bagToken) {
+        BAG = IERC20(_bagToken);
+    }
+
+    function getBAGSellQuote(uint256 currentSupply, uint256 bagOrderSize) external pure returns (uint256) {
+        uint256 deltaY = bagOrderSize;
         uint256 x0 = currentSupply;
         uint256 exp_b_x0 = uint256((int256(B.mulWad(x0))).expWad());
 
@@ -49,9 +63,9 @@ contract BondingCurve {
         return deltaY;
     }
 
-    function getEthBuyQuote(uint256 currentSupply, uint256 ethOrderSize) external pure returns (uint256) {
+    function getBAGBuyQuote(uint256 currentSupply, uint256 bagOrderSize) external pure returns (uint256) {
         uint256 x0 = currentSupply;
-        uint256 deltaY = ethOrderSize;
+        uint256 deltaY = bagOrderSize;
 
         // calculate exp(b*x0)
         uint256 exp_b_x0 = uint256((int256(B.mulWad(x0))).expWad());

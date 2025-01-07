@@ -291,4 +291,77 @@ This governance system provides:
 - **Agent Autonomy**: Agents can operate independently within the guardrails defined by governance.
 - **Flexibility**: Default logic can evolve to meet the needs of specific agents and their token holders.
 
+### **Bonding Curve Parameters**
+
+The bonding curve uses an exponential formula `y = A*e^(Bx)` where:
+- A = 1.06 (initial price in BAG)
+- B = 0.015 (growth rate)
+
+Price progression for AICO tokens:
+- Initial price: 1.06 BAG
+- At 100M tokens: ~4.24 BAG
+- At 400M tokens: ~68.12 BAG
+- At 800M tokens: ~4,634.21 BAG
+
+Total BAG required to purchase all 800M tokens: 42,000 BAG
+
+The exponential curve ensures:
+1. Low initial entry price for early participants
+2. Price appreciation that reflects increasing scarcity
+3. Natural price discovery mechanism
+4. Total BAG requirement of exactly 42,000 BAG
+
+### **Bonding Curve Mechanics**
+
+The AICO token uses an exponential bonding curve to determine token prices. The curve is defined by the formula:
+
+```
+P(x) = A*e^(Bx)
+```
+
+where:
+- P(x) is the price in BAG tokens
+- x is the current supply
+- A = 1.06 (initial price coefficient)
+- B = 0.015 (exponential growth rate)
+
+#### **Key Characteristics**
+
+1. **Price Progression**
+   - Initial price: 1.06 BAG
+   - At 100M tokens: ~4.24 BAG (4x initial)
+   - At 400M tokens: ~68.12 BAG (64x initial)
+   - At 800M tokens: ~4,634.21 BAG (4,372x initial)
+
+2. **Total Cost Integration**
+   The total BAG required to purchase all tokens is calculated by integrating the price function:
+   ```
+   Total BAG = ∫(0 to 800M) A*e^(Bx) dx = (A/B)(e^(B*800M) - 1) = 42,000 BAG
+   ```
+
+3. **Price Discovery Mechanism**
+   - Early participants benefit from lower prices
+   - Price increases exponentially with supply
+   - Natural scarcity mechanism as supply increases
+   - Market-driven valuation through continuous price discovery
+
+4. **Implementation Details**
+   - Uses FixedPointMathLib for precise calculations
+   - All values scaled by 10^18 for solidity fixed-point math
+   - Includes safety checks for insufficient liquidity
+   - Supports both buy and sell operations with symmetric pricing
+
+5. **Key Functions**
+   - `getBAGBuyQuote`: Calculate BAG needed to buy tokens
+   - `getBAGSellQuote`: Calculate tokens received for BAG
+   - `getTokenBuyQuote`: Calculate tokens received for BAG
+   - `getTokenSellQuote`: Calculate BAG received for tokens
+
+6. **Price Impact**
+   The exponential curve ensures that:
+   - Small purchases have minimal price impact early in the curve
+   - Large purchases have increasing price impact
+   - Final tokens have significant price premium
+   - Total purchase cost converges to exactly 42,000 BAG
+
 
