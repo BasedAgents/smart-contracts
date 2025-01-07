@@ -29,8 +29,10 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     address public immutable governorImplementation;
     address public immutable poolCreationSubsidy;
     address public immutable uniswapV2Factory;
-    uint256 public constant AGENT_CREATION_FEE = 100e18; // 100 BAG
+    uint256 public agentCreationFee = 100e18; // 100 BAG, upgradable
     IERC20 public immutable BAG;
+
+    event AgentCreationFeeUpdated(uint256 oldFee, uint256 newFee);
 
     constructor(
         address _tokenImplementation, 
@@ -46,6 +48,12 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         poolCreationSubsidy = _poolCreationSubsidy;
         uniswapV2Factory = _uniswapV2Factory;
         BAG = IERC20(_bagToken);
+    }
+
+    function updateAgentCreationFee(uint256 _newFee) external onlyOwner {
+        uint256 oldFee = agentCreationFee;
+        agentCreationFee = _newFee;
+        emit AgentCreationFeeUpdated(oldFee, _newFee);
     }
 
     /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V2
@@ -67,7 +75,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         uint256 _proposalThreshold
     ) external payable nonReentrant returns (address token, address governor) {
         // Collect creation fee
-        require(BAG.transferFrom(msg.sender, protocolFeeRecipient, AGENT_CREATION_FEE), "Creation fee transfer failed");
+        require(BAG.transferFrom(msg.sender, protocolFeeRecipient, agentCreationFee), "Creation fee transfer failed");
 
         bytes32 tokenSalt = _generateSalt(_tokenCreator, _tokenURI);
 

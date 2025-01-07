@@ -46,17 +46,66 @@ When an Agent token accumulates 42,000 BAG through the bonding curve:
 ### Value Accrual Mechanisms
 
 #### 1. Agent Creation Fee
-- Amount: 100 BAG
+- Initial Amount: 100 BAG
 - Recipient: Protocol Treasury
 - Timing: One-time fee at Agent token creation
 - Purpose: Ensures quality Agent launches and supports protocol development
+- Upgradable: Yes, through protocol governance
 
 #### 2. Transaction Fees
 All Agent token transactions incur a 1% fee in BAG, distributed to:
 - Token Creator: 50% (5000 BPS)
-- Protocol Treasury: 20% (2000 BPS)
-- Platform Referrer: 15% (1500 BPS)
+- Protocol Treasury: 25% (2500 BPS)
+- Platform Referrer: 10% (1000 BPS)
 - Order Referrer: 15% (1500 BPS)
+
+##### Fee Distribution Explained
+
+**Token Creator (50%)**
+- Direct revenue to the Agent token creator
+- Incentivizes quality Agent launches and ongoing development
+- Paid automatically on every transaction
+
+**Protocol Treasury (25%)**
+- Funds protocol development and maintenance
+- Supports ecosystem growth initiatives
+- Used for protocol upgrades and improvements
+
+**Platform Referrer (10%)**
+The Platform Referrer fee incentivizes the development of any integration that enables users to interact with BasedAgents:
+- Any developer or project can integrate with BasedAgents by becoming a Platform Referrer
+- BasedAgents.co is just one reference implementation
+- Integration possibilities include:
+  - Trading interfaces (web, mobile, desktop)
+  - Trading APIs and SDKs
+  - AI Agents that facilitate trading
+  - Portfolio management tools
+  - Trading bots and automation systems
+  - Analytics and market data platforms
+  - Browser extensions
+  - Telegram/Discord bots
+  - DeFi aggregators
+  - Cross-chain bridges
+- Platform Referrers earn 10% of all transaction fees generated through their integration
+- The referral address is set when the Agent token is created through their integration
+- Revenue is earned perpetually from all future trades through that integration
+- This creates an ecosystem of complementary tools and services around BasedAgents
+
+**Order Referrer (15%)**
+The Order Referrer system enables community-driven growth through a referral program:
+- Anyone can become an Order Referrer by sharing their referral address
+- Referrers earn 15% of the transaction fee when:
+  - A user buys Agent tokens using their referral code
+  - A user sells Agent tokens using their referral code
+  - The referred user makes any subsequent trades
+- Example:
+  - On a 1000 BAG trade (1% fee = 10 BAG):
+    - Referrer earns 1.5 BAG (15% of fee)
+    - This applies to every trade the referred user makes
+  - Referral relationship is permanent for that Agent token
+  - Referrers can promote multiple Agent tokens
+  - Each trade specifies the referrer address
+  - If no referrer is specified, the fee goes to Protocol Treasury
 
 #### 3. Graduation Fees
 525 BAG fee upon market graduation, following the same distribution as transaction fees

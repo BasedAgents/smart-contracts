@@ -125,8 +125,8 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
 
         TOTAL_FEE_BPS = 100; // 1%
         TOKEN_CREATOR_FEE_BPS = 5000; // 50% (of TOTAL_FEE_BPS)
-        PROTOCOL_FEE_BPS = 2000; // 20% (of TOTAL_FEE_BPS)
-        PLATFORM_REFERRER_FEE_BPS = 1500; // 15% (of TOTAL_FEE_BPS)
+        PROTOCOL_FEE_BPS = 2500; // 25% (of TOTAL_FEE_BPS)
+        PLATFORM_REFERRER_FEE_BPS = 1000; // 10% (of TOTAL_FEE_BPS)
         ORDER_REFERRER_FEE_BPS = 1500; // 15% (of TOTAL_FEE_BPS)
         MIN_ORDER_SIZE = 0.0000001e18; // Minimum order size in BAG
         graduationFee = 525e18; // Graduation fee in BAG (525 BAG)
