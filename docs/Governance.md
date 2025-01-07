@@ -3,6 +3,73 @@
 ## Overview
 The AICO Protocol implements a flexible governance system that can evolve from centralized to decentralized control, with built-in security mechanisms and configurable proposal rights. All governance capabilities described in this document are active immediately upon token deployment and remain unchanged throughout the token's lifecycle, including both before and after graduation to Uniswap. The market graduation process only affects the trading mechanism (from bonding curve to Uniswap pool) and does not impact any governance capabilities.
 
+## Governance Architecture
+
+### Contract Structure
+The governance system consists of three main contracts working together:
+
+1. **AICOGovernor**:
+   - Handles standard governance operations
+   - Manages proposals and voting
+   - Controls critical system changes
+   - Higher thresholds for fundamental changes
+
+2. **VetoContract**:
+   - Enables token holder veto rights
+   - Manages veto voting process
+   - Lower thresholds for operational vetoes
+   - Quick response to concerning actions
+
+3. **DelayModule**:
+   - Enforces delay periods
+   - Checks veto status
+   - Ensures time for community review
+   - Prevents rushed changes
+
+### Voting Parameters
+
+1. **Standard Veto Actions** (Through VetoContract):
+   - Voting Period: 72 hours
+   - Quorum: 10% of total token supply
+   - Threshold: >50% of votes in favor
+   - Delay Period: 24 hours
+   - Use Case: Regular operational decisions
+
+2. **Critical System Changes** (Through AICOGovernor):
+   - Voting Period: 7 days
+   - Quorum: 20% of total token supply
+   - Threshold: >66% of votes in favor
+   - Delay Period: 48 hours
+   - Use Case: Director transfers, fundamental changes
+
+## Governance Risks
+
+### Potential Gridlock Scenarios
+
+1. **Quorum Failures**:
+   - Large token holder inactivity could prevent reaching quorum
+   - Particularly risky for critical changes requiring 20% quorum
+   - Can block necessary upgrades or improvements
+   - Mitigation: Active community engagement and delegation
+
+2. **Competing Interests**:
+   - Director proposing changes vs token holders vetoing
+   - Could lead to operational paralysis
+   - May prevent timely responses to opportunities/threats
+   - Mitigation: Clear communication and compromise
+
+3. **Time-Critical Situations**:
+   - Mandatory delay periods could block urgent actions
+   - 24-48 hour delays might miss market opportunities
+   - No bypass mechanism for emergencies
+   - Mitigation: Proper planning and preventive measures
+
+4. **Token Distribution Impact**:
+   - Concentrated token holdings could control vetoes
+   - Fragmented holdings might struggle to reach quorum
+   - Whale influence on critical decisions
+   - Mitigation: Balanced token distribution and anti-whale measures
+
 ## Governance Structure
 
 ### Token Creator Powers

@@ -14,6 +14,7 @@ The BAG token is the native token of the BasedAgents ecosystem, powering the ent
   - Based Agents DAO / Genesis Agent: 35% (350M BAG)
     - Initially managed by Community Multisig
     - Progressive transition of functions to Genesis Agent
+    - Can periodically burn BAG tokens received from Protocol Treasury
   - Liquidity Providers: 35% (350M BAG)
     - Ensures deep liquidity for protocol operations
   - Ecosystem Fund (AI3 Agent): 30% (300M BAG)
@@ -42,6 +43,13 @@ When an Agent token accumulates 42,000 BAG through the bonding curve:
 2. Automatic Uniswap V2 pool creation
 3. Initial liquidity provision with collected BAG
 4. Transition from bonding curve to open market trading
+
+#### Protocol Treasury Management
+- Protocol Treasury receives 25% of all transaction fees
+- Genesis Agent can selectively burn BAG tokens from Protocol Treasury
+- Burning schedule and amounts determined by Genesis Agent
+- Creates deflationary pressure based on protocol usage
+- Helps maintain long-term value alignment
 
 ### Value Accrual Mechanisms
 

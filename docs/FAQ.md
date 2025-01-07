@@ -146,20 +146,64 @@ This system creates a natural balance where:
 
 ### How does governance work?
 
-**Agent Token Governance:**
-1. Director (Agent creator) has default control over Agent operations
-2. Token holders have veto power over Director's actions
-3. Token holders can vote to transfer the Director role
-4. Changes are specific to that particular Agent only
+The governance system operates through three interconnected smart contracts:
 
-**BAG Token Governance:**
-1. Proposals affect protocol-wide parameters
-2. Only BAG holders can vote on protocol changes
-3. Changes affect the entire BasedAgents ecosystem
-4. Controls critical infrastructure like:
-   - Protocol fee recipient
-   - Rewards contract
-   - Core protocol integrations (WETH, Uniswap)
+1. **AICOGovernor Contract**:
+   - Handles major governance decisions
+   - Controls critical system changes
+   - Uses stricter voting parameters
+   - Manages Director role transfers
+
+2. **VetoContract**:
+   - Enables quick response to concerning actions
+   - Uses lighter voting parameters
+   - Allows token holders to block actions
+   - Operates during delay periods
+
+3. **DelayModule**:
+   - Enforces mandatory waiting periods
+   - Checks for vetoes before execution
+   - Ensures time for community review
+   - Prevents rushed changes
+
+### What are the voting parameters?
+
+The system has two sets of voting parameters for different types of actions:
+
+1. **Standard Veto Actions**:
+   - For regular operational decisions
+   - 72-hour voting period
+   - 10% quorum requirement
+   - >50% threshold to pass
+   - 24-hour delay period
+
+2. **Critical System Changes**:
+   - For fundamental changes (e.g., Director transfer)
+   - 7-day voting period
+   - 20% quorum requirement
+   - >66% threshold to pass
+   - 48-hour delay period
+
+### What are the risks of this governance system?
+
+1. **Gridlock Risks**:
+   - Quorum failures in inactive communities
+   - Competing interests blocking progress
+   - Delays during time-critical situations
+   - Token distribution affecting voting power
+
+2. **Mitigation Strategies**:
+   - Active community engagement
+   - Clear communication channels
+   - Proper planning for changes
+   - Balanced token distribution
+   - Delegation mechanisms
+
+3. **Emergency Limitations**:
+   - No bypass for mandatory delays
+   - Must wait 24-48 hours for actions
+   - Could miss market opportunities
+   - Plan ahead for time-sensitive needs
 
 ### When can I start participating in governance?
 Immediately after acquiring tokens. Governance rights are active throughout all market stages.
@@ -265,7 +309,17 @@ BAG will be available on Uniswap and other DEXes after launch. Initial distribut
 ## Technical Questions
 
 ### How secure are the smart contracts?
-All contracts undergo thorough security audits before deployment. The platform uses battle-tested components and follows best practices in smart contract development.
+**Important Security Notice**: The BasedAgents smart contracts have not undergone a formal security audit yet. Security audits will be performed once we reach a more stable release version of the protocol. Users should be aware that interacting with unaudited smart contracts carries significant risk. Use the protocol at your own risk.
+
+However, we have implemented several security measures in the meantime:
+- Bug Bounty Program funded by Based Agents DAO (see BugBounty.md)
+- Rewards up to 100,000 BAG for critical vulnerabilities
+- Built on battle-tested OpenZeppelin contracts
+- Internal security reviews and testing
+- Time-locked governance actions
+- Veto capabilities for protection
+
+We strongly encourage security researchers to review our code and participate in our bug bounty program. All bounties are paid in BAG tokens. The bug bounty program will continue to run even after formal audits are completed to ensure ongoing security.
 
 ### What happens if an Agent's code needs updating?
 Updates must be proposed and approved through governance. Token holders review and vote on any changes.
