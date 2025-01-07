@@ -41,12 +41,11 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     uint24 internal constant LP_FEE = 500;
     int24 internal constant LP_TICK_LOWER = -887200;
     int24 internal constant LP_TICK_UPPER = 887200;
-    address public immutable WETH;
-    address public immutable nonfungiblePositionManager;
-    address public immutable swapRouter;
-    address public immutable protocolFeeRecipient;
-    address public immutable protocolRewards;
-
+    address public protocolFeeRecipient;
+    address public protocolRewards;
+    address public WETH;
+    address public nonfungiblePositionManager;
+    address public swapRouter;
     BondingCurve public bondingCurve;
     MarketType public marketType;
     address public platformReferrer;
@@ -54,6 +53,7 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     address public tokenCreator;
     string public tokenURI;
     uint256 public graduationFee;
+    address public governanceContract;
 
     constructor(
         address _protocolFeeRecipient,
@@ -68,11 +68,13 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         if (_nonfungiblePositionManager == address(0)) revert AddressZero();
         if (_swapRouter == address(0)) revert AddressZero();
 
-        protocolFeeRecipient = _protocolFeeRecipient;
-        protocolRewards = _protocolRewards;
-        WETH = _weth;
-        nonfungiblePositionManager = _nonfungiblePositionManager;
-        swapRouter = _swapRouter;
+        _setProtocolAddresses(
+            _protocolFeeRecipient,
+            _protocolRewards,
+            _weth,
+            _nonfungiblePositionManager,
+            _swapRouter
+        );
     }
 
     /// @notice Initializes a new AICO token
@@ -160,7 +162,12 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         return (amount * bps) / 10_000;
     }
 
-    // setter function
+    modifier onlyGovernance() {
+        require(msg.sender == owner() || msg.sender == address(governanceContract), "Not authorized");
+        _;
+    }
+
+    // Update existing functions to use new modifier
     function upgradeParameters(
         uint256 _MAX_TOTAL_SUPPLY,
         uint256 _PRIMARY_MARKET_SUPPLY,
@@ -172,7 +179,7 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         uint256 _ORDER_REFERRER_FEE_BPS,
         uint256 _MIN_ORDER_SIZE,
         uint256 _graduationFee
-    ) external onlyOwner {
+    ) external onlyGovernance {
         MAX_TOTAL_SUPPLY = _MAX_TOTAL_SUPPLY;
         PRIMARY_MARKET_SUPPLY = _PRIMARY_MARKET_SUPPLY;
         SECONDARY_MARKET_SUPPLY = _SECONDARY_MARKET_SUPPLY;
@@ -187,4 +194,66 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         emit TokenParametersUpdated(_MAX_TOTAL_SUPPLY, _PRIMARY_MARKET_SUPPLY, _SECONDARY_MARKET_SUPPLY);
         emit GraduationFeeUpdated(oldFee, _graduationFee);
     }
+
+    // Add function to update protocol addresses through governance
+    function updateProtocolAddresses(
+        address _protocolFeeRecipient,
+        address _protocolRewards,
+        address _weth,
+        address _nonfungiblePositionManager,
+        address _swapRouter
+    ) external onlyGovernance {
+        _setProtocolAddresses(
+            _protocolFeeRecipient,
+            _protocolRewards,
+            _weth,
+            _nonfungiblePositionManager,
+            _swapRouter
+        );
+        
+        emit ProtocolAddressesUpdated(
+            _protocolFeeRecipient,
+            _protocolRewards,
+            _weth,
+            _nonfungiblePositionManager,
+            _swapRouter
+        );
+    }
+
+    // Internal function for setting protocol addresses
+    function _setProtocolAddresses(
+        address _protocolFeeRecipient,
+        address _protocolRewards,
+        address _weth,
+        address _nonfungiblePositionManager,
+        address _swapRouter
+    ) internal {
+        if (_protocolFeeRecipient == address(0)) revert AddressZero();
+        if (_protocolRewards == address(0)) revert AddressZero();
+        if (_weth == address(0)) revert AddressZero();
+        if (_nonfungiblePositionManager == address(0)) revert AddressZero();
+        if (_swapRouter == address(0)) revert AddressZero();
+
+        protocolFeeRecipient = _protocolFeeRecipient;
+        protocolRewards = _protocolRewards;
+        WETH = _weth;
+        nonfungiblePositionManager = _nonfungiblePositionManager;
+        swapRouter = _swapRouter;
+    }
+
+    event ProtocolAddressesUpdated(
+        address protocolFeeRecipient,
+        address protocolRewards,
+        address weth,
+        address nonfungiblePositionManager,
+        address swapRouter
+    );
+
+    function setGovernanceContract(address _governanceContract) external onlyOwner {
+        require(_governanceContract != address(0), "Zero address not allowed");
+        governanceContract = _governanceContract;
+        emit GovernanceContractUpdated(_governanceContract);
+    }
+
+    event GovernanceContractUpdated(address newGovernanceContract);
 } 

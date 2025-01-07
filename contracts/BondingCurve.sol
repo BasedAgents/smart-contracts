@@ -30,8 +30,8 @@ contract BondingCurve {
     // At 100M tokens: ~4.24 BAG
     // At 400M tokens: ~68.12 BAG
     // At 800M tokens: ~4,634.21 BAG
-    uint256 public immutable A = 1060848709;
-    uint256 public immutable B = 15000000000;
+    uint256 public A;
+    uint256 public B;
 
     constructor(address _bagToken) {
         BAG = IERC20(_bagToken);
@@ -88,5 +88,11 @@ contract BondingCurve {
         uint256 deltaY = (exp_b_x1 - exp_b_x0).fullMulDiv(A, B);
 
         return deltaY;
+    }
+
+    function updateCurveParameters(uint256 _A, uint256 _B) external onlyOwner {
+        A = _A;
+        B = _B;
+        emit CurveParametersUpdated(A, B);
     }
 }

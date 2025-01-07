@@ -1,15 +1,66 @@
 # AICO Protocol Tokenomics
 
+## Governance Control
+Parameters can be modified through two authorized entities:
+1. Token Creator (set as owner during token initialization)
+   - This is the address that creates the token through the factory
+   - Has full control over their specific AICO token instance
+   - Can update parameters and set governance contract
+2. Governance Contract (can be set/updated by token creator)
+   - Separate contract that can be given parameter update rights
+   - Set via `setGovernanceContract` by token creator
+   - Can be updated or revoked by token creator
+
+### Governance Setup
+- Owner can set/update governance contract address via `setGovernanceContract`
+- Both owner and governance contract can call parameter update functions
+- Governance contract address cannot be zero address
+- Changes tracked via `GovernanceContractUpdated` event
+
+## Parameter Modification Rights
+
+### Modifiable by Owner OR Governance Contract
+The following parameters can be updated via `upgradeParameters`:
+1. Supply Parameters:
+   - Maximum Total Supply (`MAX_TOTAL_SUPPLY`)
+   - Primary Market Supply (`PRIMARY_MARKET_SUPPLY`)
+   - Secondary Market Supply (`SECONDARY_MARKET_SUPPLY`)
+
+2. Fee Parameters:
+   - Total Fee BPS (`TOTAL_FEE_BPS`)
+   - Token Creator Fee BPS (`TOKEN_CREATOR_FEE_BPS`)
+   - Protocol Fee BPS (`PROTOCOL_FEE_BPS`)
+   - Platform Referrer Fee BPS (`PLATFORM_REFERRER_FEE_BPS`)
+   - Order Referrer Fee BPS (`ORDER_REFERRER_FEE_BPS`)
+   - Minimum Order Size (`MIN_ORDER_SIZE`)
+   - Graduation Fee (`graduationFee`)
+
+3. Protocol Addresses (via `updateProtocolAddresses`):
+   - Protocol Fee Recipient
+   - Protocol Rewards Contract
+   - WETH Contract
+   - Nonfungible Position Manager
+   - Swap Router
+
+### Modifiable by Owner Only
+- Governance Contract Address (via `setGovernanceContract`)
+
+## Protocol Fee Recipient
+- Current Address: `0x973de1CDAce46ddF5904cF46cb96E6d039Ac75C2`
+- Modifiable through governance upgrade
+- Serves as:
+  - Default recipient for protocol fees (20% of total fees)
+  - Default recipient for platform referrer fees when no referrer specified
+  - Default recipient for order referrer fees when no referrer specified
+
 ## Transaction Fees
 
 ### Base Fee
 - Total Fee: 1% (100 BPS) of each transaction
-  - Mutable: Yes, via `upgradeParameters`
-  - Controller: AICO token owner
+  - Mutable: Yes, via governance
   - Parameter: `TOTAL_FEE_BPS`
 - Minimum Order Size: 0.0000001 BAG
-  - Mutable: Yes, via `upgradeParameters`
-  - Controller: AICO token owner
+  - Mutable: Yes, via governance
   - Parameter: `MIN_ORDER_SIZE`
 
 ### Fee Distribution
@@ -41,14 +92,13 @@ Total fee is split among four parties (all percentages mutable by AICO token own
 
 ## Market Graduation Fee
 - Amount: 525 BAG
-  - Mutable: Yes, via `upgradeParameters`
-  - Controller: AICO token owner
+  - Mutable: Yes, via governance
   - Parameter: `graduationFee`
 - Distribution: Same as transaction fees
 - Timing: One-time fee at market graduation
 
 ## Supply Parameters
-All supply parameters mutable via `upgradeParameters` by AICO token owner:
+All supply parameters mutable via governance:
 - Maximum Total Supply: 1,000,000,000 tokens (`MAX_TOTAL_SUPPLY`)
 - Primary Market Supply: 800,000,000 tokens (`PRIMARY_MARKET_SUPPLY`)
 - Secondary Market Supply: 200,000,000 tokens (`SECONDARY_MARKET_SUPPLY`)
@@ -79,9 +129,19 @@ Total BAG required: 42,000 BAG
 - Events: All fee distributions tracked via `BagTokenFees` events
 
 ## Parameter Update Process
-1. AICO token owner calls `upgradeParameters` function
-2. Function validates new parameters
-3. Updates take effect immediately
+1. Governance proposal created
+2. Community voting period
+3. If approved:
+   - For parameter updates: `upgradeParameters` function called
+   - For contract upgrades: Upgrade process initiated
 4. Events emitted:
    - `TokenParametersUpdated` for supply changes
-   - `GraduationFeeUpdated` for graduation fee changes 
+   - `GraduationFeeUpdated` for graduation fee changes
+   - Additional events for governance actions
+
+## Governance Upgrade Process
+The ability to modify these parameters can be transferred to:
+1. Community multisig
+2. BasedAgents DAO
+3. Any future governance mechanism
+through appropriate contract upgrades approved by token holders. 
