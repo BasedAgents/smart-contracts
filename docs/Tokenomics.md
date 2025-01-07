@@ -100,23 +100,24 @@ Total fee is split among four parties (all percentages mutable by AICO token own
 ## Supply Parameters
 All supply parameters mutable via governance:
 - Maximum Total Supply: 1,000,000,000 tokens (`MAX_TOTAL_SUPPLY`)
-- Primary Market Supply: 800,000,000 tokens (`PRIMARY_MARKET_SUPPLY`)
+- Primary Market Supply: 500,000,000 tokens (`PRIMARY_MARKET_SUPPLY`)
 - Secondary Market Supply: 200,000,000 tokens (`SECONDARY_MARKET_SUPPLY`)
+- Agent Allocation: 300,000,000 tokens (`AGENT_ALLOCATION`)
 
 ## Bonding Curve Parameters
 Bonding curve uses formula `y = A*e^(Bx)` where:
 - A = 1.06 BAG (initial price coefficient)
   - Immutable after deployment
   - Set in BondingCurve contract constructor
-- B = 0.015 (exponential growth rate)
+- B = 0.023 (exponential growth rate)
   - Immutable after deployment
   - Set in BondingCurve contract constructor
 
 Price progression (determined by immutable A and B parameters):
 - Initial price: 1.06 BAG
-- At 100M tokens: ~4.24 BAG
-- At 400M tokens: ~68.12 BAG
-- At 800M tokens: ~4,634.21 BAG
+- At 100M tokens: ~10.2 BAG
+- At 250M tokens: ~98.5 BAG
+- At 500M tokens: ~4,634.21 BAG
 Total BAG required: 42,000 BAG
 
 ## Fee Management

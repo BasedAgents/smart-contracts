@@ -24,12 +24,12 @@ contract BondingCurve {
     
     // y = A*e^(Bx)
     // A = ~1.06 BAG initial price
-    // B = 0.015 adjusted for 42k BAG total cost
+    // B = 0.023 adjusted for 500k BAG total cost
     // Price progression:
     // At 0 tokens: 1.06 BAG
-    // At 100M tokens: ~4.24 BAG
-    // At 400M tokens: ~68.12 BAG
-    // At 800M tokens: ~4,634.21 BAG
+    // At 100M tokens: ~10.2 BAG
+    // At 250M tokens: ~98.5 BAG
+    // At 500M tokens: ~4,634.21 BAG
     uint256 public A;
     uint256 public B;
 
