@@ -364,4 +364,57 @@ where:
    - Final tokens have significant price premium
    - Total purchase cost converges to exactly 42,000 BAG
 
+# Protocol Fee Structure
+
+## Transaction Fees
+
+### Base Fee
+- Total Fee: 1% (100 BPS) of each transaction
+- Minimum Order Size: 0.0000001 BAG
+
+### Fee Distribution
+Total fee is split among four parties:
+
+1. **Token Creator** (50% of total fee)
+   - BPS Value: 5000
+   - Recipient: `tokenCreator` (set during AICO deployment)
+   - Purpose: Rewards the AI agent creator/developer
+   - Event ID: `AICO_CREATOR_FEE`
+
+2. **Protocol** (20% of total fee)
+   - BPS Value: 2000
+   - Recipient: `protocolFeeRecipient`
+   - Purpose: Protocol maintenance and development
+   - Event ID: `AICO_PROTOCOL_FEE`
+
+3. **Platform Referrer** (15% of total fee)
+   - BPS Value: 1500
+   - Recipient: `platformReferrer`
+   - Defaults to: `protocolFeeRecipient` if not set
+   - Purpose: Rewards the platform facilitating agent creation
+   - Event ID: `AICO_PLATFORM_REFERRER_FEE`
+
+4. **Order Referrer** (15% of total fee)
+   - BPS Value: 1500
+   - Recipient: `orderReferrer`
+   - Defaults to: `protocolFeeRecipient` if not set
+   - Purpose: Rewards trade referrers
+   - Event ID: `AICO_ORDER_REFERRER_FEE`
+
+## Market Graduation Fee
+- Amount: 525 BAG
+- Timing: Charged when market graduates from bonding curve to Uniswap V3
+- Distribution: Follows the same percentage split as transaction fees (50/20/15/15)
+
+## Supply Parameters
+- Maximum Total Supply: 1,000,000,000 tokens
+- Primary Market Supply: 800,000,000 tokens (bonding curve)
+- Secondary Market Supply: 200,000,000 tokens (Uniswap V3)
+
+## Fee Management
+- Fees are collected through `_disperseFees` function
+- All fees are sent to ProtocolRewards contract
+- Fees can be updated by owner through `upgradeParameters` function
+- Fee events are emitted through `BagTokenFees` event
+
 
