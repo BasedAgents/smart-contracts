@@ -15,6 +15,9 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {BondingCurve} from "./BondingCurve.sol";
 import {ERC20VotesUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
+import {IUniswapV2Factory} from "./interfaces/IUniswapV2Factory.sol";
+import {IUniswapV2Pair} from "./interfaces/IUniswapV2Pair.sol";
+import {PoolCreationSubsidy} from "./PoolCreationSubsidy.sol";
 
 /* 
     !!!         !!!         !!!    
@@ -54,26 +57,28 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     string public tokenURI;
     uint256 public graduationFee;
     address public governanceContract;
+    address public poolCreationSubsidy;
+    address public uniswapV2Factory;
 
     constructor(
         address _protocolFeeRecipient,
         address _protocolRewards,
         address _weth,
-        address _nonfungiblePositionManager,
-        address _swapRouter
+        address _poolCreationSubsidy,
+        address _uniswapV2Factory
     ) initializer {
         if (_protocolFeeRecipient == address(0)) revert AddressZero();
         if (_protocolRewards == address(0)) revert AddressZero();
         if (_weth == address(0)) revert AddressZero();
-        if (_nonfungiblePositionManager == address(0)) revert AddressZero();
-        if (_swapRouter == address(0)) revert AddressZero();
+        if (_poolCreationSubsidy == address(0)) revert AddressZero();
+        if (_uniswapV2Factory == address(0)) revert AddressZero();
 
         _setProtocolAddresses(
             _protocolFeeRecipient,
             _protocolRewards,
             _weth,
-            _nonfungiblePositionManager,
-            _swapRouter
+            _poolCreationSubsidy,
+            _uniswapV2Factory
         );
     }
 
@@ -256,4 +261,50 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     }
 
     event GovernanceContractUpdated(address newGovernanceContract);
+
+    /// @notice Creates the Uniswap V2 pool during market graduation
+    function _createAndInitializePool() internal returns (address pair) {
+        // Use the subsidy contract to create the pool
+        pair = PoolCreationSubsidy(poolCreationSubsidy).createPool(address(this), WETH);
+        
+        poolAddress = pair;
+        return pair;
+    }
+
+    /// @notice Handles the market graduation process
+    function _handleMarketGraduation(uint256 ethLiquidity) internal {
+        if (marketType != MarketType.BONDING_CURVE) revert MarketAlreadyGraduated();
+        
+        // Create the pool using the subsidy contract
+        address pair = _createAndInitializePool();
+        
+        // Transfer the graduation fee
+        _transfer(msg.sender, address(this), graduationFee);
+        
+        // Update market type
+        marketType = MarketType.UNISWAP_POOL;
+        
+        // Add initial liquidity to the V2 pool
+        _addInitialLiquidity(pair, ethLiquidity);
+        
+        emit AICOMarketGraduated(
+            address(this),
+            pair,
+            ethLiquidity,
+            SECONDARY_MARKET_SUPPLY,
+            0, // No position ID in V2
+            marketType
+        );
+    }
+
+    /// @notice Adds initial liquidity to the Uniswap V2 pool
+    function _addInitialLiquidity(address pair, uint256 ethLiquidity) internal {
+        // Transfer tokens to the pair
+        _transfer(address(this), pair, SECONDARY_MARKET_SUPPLY);
+        IWETH(WETH).deposit{value: ethLiquidity}();
+        IWETH(WETH).transfer(pair, ethLiquidity);
+        
+        // Initialize the pair
+        IUniswapV2Pair(pair).mint(address(this));
+    }
 } 

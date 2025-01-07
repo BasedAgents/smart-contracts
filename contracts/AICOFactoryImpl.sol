@@ -25,14 +25,24 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     address public immutable tokenImplementation;
     address public immutable bondingCurve;
     address public immutable governorImplementation;
+    address public immutable poolCreationSubsidy;
+    address public immutable uniswapV2Factory;
 
-    constructor(address _tokenImplementation, address _governorImplementation, address _bondingCurve) initializer {
+    constructor(
+        address _tokenImplementation, 
+        address _governorImplementation, 
+        address _bondingCurve,
+        address _poolCreationSubsidy,
+        address _uniswapV2Factory
+    ) initializer {
         tokenImplementation = _tokenImplementation;
         governorImplementation = _governorImplementation;
         bondingCurve = _bondingCurve;
+        poolCreationSubsidy = _poolCreationSubsidy;
+        uniswapV2Factory = _uniswapV2Factory;
     }
 
-    /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V3
+    /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V2
     /// @param _tokenCreator The address of the token creator
     /// @param _platformReferrer The address of the platform referrer
     /// @param _tokenURI The ERC20z token URI
@@ -56,6 +66,8 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
             _tokenCreator,
             _platformReferrer,
             bondingCurve,
+            poolCreationSubsidy,
+            uniswapV2Factory,
             _tokenURI,
             _name,
             _symbol
@@ -82,7 +94,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
             _name,
             _symbol,
             address(token),
-            AICO(payable(token)).poolAddress()
+            address(0) // Pool address is not created at deployment
         );
 
         emit GovernorCreated(

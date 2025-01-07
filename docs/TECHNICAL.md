@@ -129,4 +129,32 @@
    - Regular security audits
    - Incident response procedures
 
+## Market Graduation
+
+### Pool Creation
+- The Uniswap V2 pool is created only when the token graduates from the bonding curve to Uniswap
+- This happens when all 800M tokens from the primary market supply are sold
+- Pool creation is subsidized by the protocol through the PoolCreationSubsidy contract
+- The pool parameters are immutable and set during graduation
+
+### Pool Creation Subsidy
+- The protocol maintains a PoolCreationSubsidy contract with ETH balance
+- This contract pays for the gas costs of creating new Uniswap V2 pools
+- Only authorized AICO tokens can request pool creation through this contract
+- The subsidy removes the burden of pool creation costs from both token creators and buyers
+
+### Graduation Process
+1. All 800M tokens from primary market supply are sold
+2. Graduation fee (525 BAG) is charged
+3. Uniswap V2 pool is created and initialized using protocol's subsidy
+4. Initial liquidity is added to the pool
+5. Market type changes from BONDING_CURVE to UNISWAP_POOL
+6. Trading continues on Uniswap with the remaining 200M token supply
+
+### Gas Optimization
+- Pool creation is deferred until graduation to save gas
+- Pool creation costs are subsidized by the protocol
+- If a token never graduates (doesn't sell all 800M tokens), no gas is spent on pool creation
+- This optimization is especially important for tokens that may not reach graduation
+
 
