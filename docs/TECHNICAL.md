@@ -133,7 +133,7 @@
 
 ### Pool Creation
 - The Uniswap V2 pool is created only when the token graduates from the bonding curve to Uniswap
-- This happens when all 800M tokens from the primary market supply are sold
+- This happens when all 500M tokens from the primary market supply are sold
 - Pool creation is subsidized by the protocol through the PoolCreationSubsidy contract
 - The pool parameters are immutable and set during graduation
 
@@ -144,7 +144,7 @@
 - The subsidy removes the burden of pool creation costs from both token creators and buyers
 
 ### Graduation Process
-1. All 800M tokens from primary market supply are sold
+1. All 500M tokens from primary market supply are sold
 2. Graduation fee (525 BAG) is charged
 3. Uniswap V2 pool is created and initialized using protocol's subsidy
 4. Initial liquidity is added to the pool
@@ -154,7 +154,29 @@
 ### Gas Optimization
 - Pool creation is deferred until graduation to save gas
 - Pool creation costs are subsidized by the protocol
-- If a token never graduates (doesn't sell all 800M tokens), no gas is spent on pool creation
+- If a token never graduates (doesn't sell all 500M tokens), no gas is spent on pool creation
 - This optimization is especially important for tokens that may not reach graduation
+
+## Token Allocation
+
+### Initial Distribution
+- Total Supply: 1,000,000,000 tokens (1B)
+- Primary Market (Bonding Curve): 500,000,000 tokens (500M)
+- Secondary Market (Uniswap): 200,000,000 tokens (200M)
+- Agent Allocation: 300,000,000 tokens (300M)
+
+### Agent Allocation
+- 300M tokens are minted directly to the Agent's wallet at deployment
+- These tokens are available immediately for:
+  - Paying contributors
+  - Funding grants
+  - Other Agent operations
+- The Agent's wallet address is set during token deployment and cannot be changed
+
+### Market Graduation
+- The Uniswap V2 pool is created only when the token graduates from the bonding curve to Uniswap
+- This happens when all 500M tokens from the primary market supply are sold
+- Pool creation is subsidized by the protocol through the PoolCreationSubsidy contract
+- The pool parameters are immutable and set during graduation
 
 

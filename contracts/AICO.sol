@@ -59,6 +59,8 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     address public governanceContract;
     address public poolCreationSubsidy;
     address public uniswapV2Factory;
+    address public agentWallet;
+    uint256 public AGENT_ALLOCATION;
 
     constructor(
         address _protocolFeeRecipient,
@@ -86,6 +88,7 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     /// @param _tokenCreator The address of the token creator
     /// @param _platformReferrer The address of the platform referrer
     /// @param _bondingCurve The address of the bonding curve module
+    /// @param _agentWallet The address of the Agent's wallet
     /// @param _tokenURI The ERC20z token URI
     /// @param _name The token name
     /// @param _symbol The token symbol
@@ -93,16 +96,33 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         address _tokenCreator,
         address _platformReferrer,
         address _bondingCurve,
+        address _agentWallet,
         string memory _tokenURI,
         string memory _name,
         string memory _symbol
     ) public payable initializer {
-        // ... rest of the initialization code ...
+        if (_tokenCreator == address(0)) revert AddressZero();
+        if (_platformReferrer == address(0)) revert AddressZero();
+        if (_bondingCurve == address(0)) revert AddressZero();
+        if (_agentWallet == address(0)) revert AddressZero();
+
+        __ERC20_init(_name, _symbol);
+        __ERC20Votes_init();
+        __Ownable_init(_tokenCreator);
+        __ReentrancyGuard_init();
+
+        tokenCreator = _tokenCreator;
+        platformReferrer = _platformReferrer;
+        bondingCurve = BondingCurve(_bondingCurve);
+        agentWallet = _agentWallet;
+        tokenURI = _tokenURI;
 
         // Initialize constants as storage variables
         MAX_TOTAL_SUPPLY = 1_000_000_000e18; // 1B tokens
-        PRIMARY_MARKET_SUPPLY = 800_000_000e18; // 800M tokens
-        SECONDARY_MARKET_SUPPLY = 200_000_000e18; // 200M tokens
+        PRIMARY_MARKET_SUPPLY = 500_000_000e18; // 500M tokens for bonding curve
+        SECONDARY_MARKET_SUPPLY = 200_000_000e18; // 200M tokens for Uniswap
+        AGENT_ALLOCATION = 300_000_000e18; // 300M tokens for Agent
+
         TOTAL_FEE_BPS = 100; // 1%
         TOKEN_CREATOR_FEE_BPS = 5000; // 50% (of TOTAL_FEE_BPS)
         PROTOCOL_FEE_BPS = 2000; // 20% (of TOTAL_FEE_BPS)
@@ -111,7 +131,10 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         MIN_ORDER_SIZE = 0.0000001e18; // Minimum order size in BAG
         graduationFee = 525e18; // Graduation fee in BAG (525 BAG)
 
-        // ... rest of initialization code ...
+        // Mint the Agent's allocation immediately
+        _mint(agentWallet, AGENT_ALLOCATION);
+
+        emit TokenParametersUpdated(MAX_TOTAL_SUPPLY, PRIMARY_MARKET_SUPPLY, SECONDARY_MARKET_SUPPLY);
     }
 
     // ... rest of the contract functions with renamed references ...

@@ -45,12 +45,14 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V2
     /// @param _tokenCreator The address of the token creator
     /// @param _platformReferrer The address of the platform referrer
+    /// @param _agentWallet The address of the agent wallet
     /// @param _tokenURI The ERC20z token URI
     /// @param _name The ERC20 token name
     /// @param _symbol The ERC20 token symbol
     function deploy(
         address _tokenCreator,
         address _platformReferrer,
+        address _agentWallet,
         string memory _tokenURI,
         string memory _name,
         string memory _symbol,
@@ -66,8 +68,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
             _tokenCreator,
             _platformReferrer,
             bondingCurve,
-            poolCreationSubsidy,
-            uniswapV2Factory,
+            _agentWallet,
             _tokenURI,
             _name,
             _symbol
