@@ -25,25 +25,4 @@ To add your contribution:
 - **Status**: Will be updated by maintainers (Pending Review/Approved/Paid)
 - **Amount**: Will be determined by maintainers based on contribution value
 
-Note: Please maintain the table format and ensure all cells are properly aligned. Use markdown links format for URLs: `[text](url)`.
-
----
-
-[Previous format for reference]
-
-## Legacy Format
-
-```markdown
-### [GitHub Username] - [Date: YYYY-MM-DD]
-- **Type**: [Code/Documentation/Research/Content]
-- **Description**: Brief description of the contribution
-- **Links**: 
-  - PR: [Link to pull request]
-  - Issue: [Link to related issue]
-  - Additional: [Any other relevant links]
-- **Wallet**: [Your Ethereum wallet address]
-- **Status**: [Pending Review/Approved/Paid]
-- **Amount**: [Amount in BAG tokens, if approved]
-```
-
-[New contributions should use the table format above] 
+Note: Please maintain the table format and ensure all cells are properly aligned. Use markdown links format for URLs: `[text](url)`. 
