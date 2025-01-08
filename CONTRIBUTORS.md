@@ -1,6 +1,6 @@
-# BasedAgents Contributors
+# Based Agents Contributors
 
-This file tracks all contributions to the BasedAgents protocol that have been approved for payment from the DAO treasury. All payments are made in BAG tokens.
+This file tracks all contributions to the Based Agents protocol that have been approved for payment from the DAO treasury. All payments are made in BAG tokens.
 
 ## Contribution Table
 

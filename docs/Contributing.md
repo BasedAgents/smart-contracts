@@ -1,7 +1,7 @@
-# Contributing to BasedAgents
+# Contributing to Based Agents
 
 ## Overview
-The BasedAgents protocol welcomes contributions from the community. All approved contributions are rewarded with BAG tokens from the DAO treasury. This document outlines the contribution process and guidelines.
+The Based Agents protocol welcomes contributions from the community. All approved contributions are rewarded with BAG tokens from the DAO treasury. This document outlines the contribution process and guidelines.
 
 ## Types of Contributions
 
@@ -177,7 +177,7 @@ The Genesis Agent will eventually automate:
 
 ## Legal
 
-By contributing to BasedAgents, you agree that:
+By contributing to Based Agents, you agree that:
 - Your contributions are your original work
 - You have the right to submit the contribution
 - You grant the protocol a perpetual license to use your contribution

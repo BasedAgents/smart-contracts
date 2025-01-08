@@ -11,21 +11,21 @@
 
 ## General Questions
 
-### What is BasedAgents?
-BasedAgents is the universal marketplace for AI Agents, where anyone can launch, trade, and govern AI Agent tokens. It's designed to be the foundation for autonomous organizations powered by AI.
+### What is Based Agents?
+Based Agents is the universal marketplace for AI Agents, where anyone can launch, trade, and govern AI Agent tokens. It's designed to be the foundation for autonomous organizations powered by AI.
 
 ### What is an AICO?
 AICO (AI Coin Offering) is our standardized launch mechanism for AI Agent tokens. It provides a fair distribution through a bonding curve and ensures proper governance mechanisms are in place.
 
-### What makes BasedAgents different from other AI token platforms?
-Unlike platforms launching mere meme tokens, BasedAgents provides real utility and governance power. Token holders can control their Agent's treasury, code, and strategic direction through comprehensive governance mechanisms.
+### What makes Based Agents different from other AI token platforms?
+Unlike platforms launching mere meme tokens, Based Agents provides real utility and governance power. Token holders can control their Agent's treasury, code, and strategic direction through comprehensive governance mechanisms.
 
-### Which blockchain is BasedAgents on?
-BasedAgents is deployed on Base, chosen for its high performance, low costs, and strong ecosystem support.
+### Which blockchain is Based Agents on?
+Based Agents is deployed on Base, chosen for its high performance, low costs, and strong ecosystem support.
 
 ## For Agent Creators
 
-### How do I launch an Agent on BasedAgents?
+### How do I launch an Agent on Based Agents?
 1. Pay the 100 BAG creation fee
 2. Configure your Agent parameters
 3. Deploy through the AICO Factory
@@ -309,7 +309,7 @@ BAG will be available on Uniswap and other DEXes after launch. Initial distribut
 ## Technical Questions
 
 ### How secure are the smart contracts?
-**Important Security Notice**: The BasedAgents smart contracts have not undergone a formal security audit yet. Security audits will be performed once we reach a more stable release version of the protocol. Users should be aware that interacting with unaudited smart contracts carries significant risk. Use the protocol at your own risk.
+**Important Security Notice**: The Based Agents smart contracts have not undergone a formal security audit yet. Security audits will be performed once we reach a more stable release version of the protocol. Users should be aware that interacting with unaudited smart contracts carries significant risk. Use the protocol at your own risk.
 
 However, we have implemented several security measures in the meantime:
 - Bug Bounty Program funded by Based Agents DAO (see BugBounty.md)
@@ -373,7 +373,7 @@ Running an Agent involves various operational costs:
    - Instance hosting and compute
    - Model inference
    - Framework maintenance
-   These costs are covered by BasedAgents or our partners if your Agent maintains the required minimum trading volume.
+   These costs are covered by Based Agents or our partners if your Agent maintains the required minimum trading volume.
 
 2. Other operational costs (covered by Agent Creator):
    - API calls to external services

@@ -1,9 +1,9 @@
-# BasedAgents Protocol Tokenomics
+# Based Agents Protocol Tokenomics
 
 ## Core Token: $BAG
 
 ### Overview
-The BAG token is the native token of the BasedAgents ecosystem, powering the entire protocol through three core functions:
+The BAG token is the native token of the Based Agents ecosystem, powering the entire protocol through three core functions:
 1. Agent Token Creation & Trading
 2. Protocol Governance
 3. Value Accrual through Protocol Fees
@@ -80,9 +80,9 @@ All Agent token transactions incur a 1% fee in BAG, distributed to:
 - Used for protocol upgrades and improvements
 
 **Platform Referrer (10%)**
-The Platform Referrer fee incentivizes the development of any integration that enables users to interact with BasedAgents:
-- Any developer or project can integrate with BasedAgents by becoming a Platform Referrer
-- BasedAgents.co is just one reference implementation
+The Platform Referrer fee incentivizes the development of any integration that enables users to interact with Based Agents:
+- Any developer or project can integrate with Based Agents by becoming a Platform Referrer
+- Based Agents.co is just one reference implementation
 - Integration possibilities include:
   - Trading interfaces (web, mobile, desktop)
   - Trading APIs and SDKs
@@ -97,7 +97,7 @@ The Platform Referrer fee incentivizes the development of any integration that e
 - Platform Referrers earn 10% of all transaction fees generated through their integration
 - The referral address is set when the Agent token is created through their integration
 - Revenue is earned perpetually from all future trades through that integration
-- This creates an ecosystem of complementary tools and services around BasedAgents
+- This creates an ecosystem of complementary tools and services around Based Agents
 
 **Order Referrer (15%)**
 The Order Referrer system enables community-driven growth through a referral program:

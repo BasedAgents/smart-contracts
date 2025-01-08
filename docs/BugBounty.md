@@ -1,12 +1,12 @@
-# BasedAgents Bug Bounty Program
+# Based Agents Bug Bounty Program
 
 ## Overview
-The BasedAgents Bug Bounty Program is funded by the Based Agents DAO to incentivize security researchers to identify and responsibly disclose potential vulnerabilities in the protocol's smart contracts. All bounties are paid in BAG tokens.
+The Based Agents Bug Bounty Program is funded by the Based Agents DAO to incentivize security researchers to identify and responsibly disclose potential vulnerabilities in the protocol's smart contracts. All bounties are paid in BAG tokens.
 
 ## Scope
 
 ### In Scope
-- All deployed smart contracts in the BasedAgents protocol
+- All deployed smart contracts in the Based Agents protocol
 - AICO Factory and implementation contracts
 - Governance contracts
 - Bonding curve mechanisms

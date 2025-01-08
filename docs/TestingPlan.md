@@ -1,7 +1,7 @@
-# BasedAgents Testing Plan
+# Based Agents Testing Plan
 
 ## Overview
-This document outlines the comprehensive testing plan for the BasedAgents protocol. Each test case includes specific steps, expected outcomes, and verification methods.
+This document outlines the comprehensive testing plan for the Based Agents protocol. Each test case includes specific steps, expected outcomes, and verification methods.
 
 ## Core Contract Testing
 
