@@ -108,120 +108,42 @@ Our core product is the AICO Launchpad on the Base blockchain. The platform simp
 - **Governance**: Enables token holder voting and proposal execution
 - **Pool Creation Subsidy**: Manages gas-efficient Uniswap pool creation
 
-#### Market Phases
-1. **Primary Market (Bonding Curve)**
-   - Supply: 500M tokens
-   - Price: Determined by bonding curve (y = A*e^(Bx))
-   - Initial price: 1.06 BAG
-   - Final price: ~4,634.21 BAG
-   - Total BAG required: 42,000 BAG
+For detailed information about market phases, token distribution, fee structures, and economic parameters, please refer to our [Tokenomics documentation](./Tokenomics.md).
 
-2. **Market Graduation**
-   - Triggered when primary market supply is sold
-   - Graduation fee: 525 BAG
-   - Automated Uniswap V2 pool creation
-   - Gas costs subsidized by protocol
+### 3.2 Referral System
 
-3. **Secondary Market (Uniswap)**
-   - Supply: 200M tokens
-   - Market-determined pricing
-   - Open trading on Uniswap V2
+The protocol includes a comprehensive referral system to incentivize ecosystem growth and development. For specific details about referral mechanisms and fee structures, please consult the [Tokenomics documentation](./Tokenomics.md).
 
-### 3.2 Token Distribution
+## 4. Token Economics
 
-- Total Supply: 1,000,000,000 tokens (1B)
-  - Primary Market: 500M tokens (Bonding Curve)
-  - Secondary Market: 200M tokens (Uniswap)
-  - Agent Allocation: 300M tokens (Direct mint)
+For comprehensive details about the Based Agents token economics, including supply distribution, fee structures, and value accrual mechanisms, please refer to our [Tokenomics documentation](./Tokenomics.md).
 
-### 3.3 Fee Structure
+### 4.1 Governance Overview
 
-1. **Agent Creation Fee**
-   - Amount: 100 BAG
-   - Recipient: Protocol Treasury
-   - Purpose: Quality assurance and protocol development
-   - Upgradable through governance
+The Based Agents protocol implements a flexible, multi-layered governance system that supports progressive decentralization. The system is designed to balance efficient operation with token holder protection through:
 
-2. **Transaction Fees (1% of trade value)**
-   - Agent's Wallet: 50% (5000 BPS)
-   - Protocol Treasury: 25% (2500 BPS)
-   - Platform Referrer: 10% (1000 BPS)
-   - Order Referrer: 15% (1500 BPS)
+1. **Protocol Governance**: BAG token holders govern protocol-level decisions
+2. **Agent Governance**: Each Agent token provides governance rights over its specific Agent
+3. **Progressive Decentralization**: Flexible system that can evolve from centralized to decentralized control
 
-### 3.4 Referral System
+For detailed information about governance mechanisms, voting parameters, and governance evolution, please refer to our [Governance documentation](./Governance.md).
 
-#### Platform Referrer
-- Any developer/project can integrate with BasedAgents
-- Integration possibilities:
-  - Trading interfaces
-  - Trading APIs/SDKs
-  - AI Agents
-  - Portfolio tools
-  - Trading bots
-  - Analytics platforms
-  - Browser extensions
-  - Chat bots
-  - DeFi aggregators
-  - Cross-chain bridges
-- Earns 10% of all fees through their integration
-- Perpetual revenue stream
+### 4.2 Value Drivers
 
-#### Order Referrer
-- Community-driven growth mechanism
-- 15% of transaction fees for referred trades
-- Permanent referral relationship per Agent token
-- Default to Protocol Treasury if unspecified
+1. **Protocol Utility**
+   - Essential infrastructure for AI Agent deployment
+   - Standardized token creation and distribution
+   - Framework integration capabilities
 
-## 4. $BAG Token
+2. **Ecosystem Growth**
+   - Growing ecosystem of Agent frameworks
+   - Community-driven development
+   - Cross-Agent collaboration
 
-### 4.1 Token Distribution
-- Total Supply: 1,000,000,000 BAG (1B tokens)
-- Distribution:
-  - Based Agents DAO / Genesis Agent: 35% (350M BAG)
-  - Liquidity Providers: 35% (350M BAG)
-  - Ecosystem Fund (AI3 Agent): 30% (300M BAG)
-
-### 4.2 Value Accrual Mechanisms
-1. Agent Creation Fees
-2. Transaction Fees
-3. Graduation Fees
-4. Locked Liquidity in Agent Token Pools
-
-### 4.3 Governance Rights
-
-#### Protocol-Level Governance ($BAG holders)
-- Protocol parameter modifications
-- Fee structure updates
-- Contract upgrades
-- Treasury management
-
-#### Agent-Level Governance (Agent token holders)
-Each Agent token provides comprehensive governance rights over its specific Agent:
-
-1. **Treasury Control**
-   - Full authority over the Agent's 300M token allocation
-   - Control of funds accumulated from transaction fees
-   - Power to allocate resources for development and operations
-
-2. **Technical Control**
-   - Authority to upgrade smart contracts
-   - Control over the Agent's operational parameters
-   - Power to modify or replace AI models
-   - Ability to integrate new capabilities or frameworks
-
-3. **Operational Control**
-   - Setting transaction limits and thresholds
-   - Defining operational rules and constraints
-   - Managing integrations with external systems
-   - Controlling revenue models and fee structures
-
-4. **Strategic Control**
-   - Setting the Agent's mission and objectives
-   - Approving partnerships and collaborations
-   - Defining risk management policies
-   - Steering product development direction
-
-This multi-layered governance approach ensures that while $BAG holders control the protocol's evolution, each Agent token holder has real, executable power over their specific Agent's development and operations. This creates a true decentralized ecosystem where token holders are active participants in their Agent's success, not passive speculators.
+3. **Network Effects**
+   - Framework interoperability
+   - Agent-to-Agent interactions
+   - Shared infrastructure and tools
 
 ## 5. Roadmap
 
@@ -266,45 +188,6 @@ This multi-layered governance approach ensures that while $BAG holders control t
    - AI-driven governance optimization
    - Global Agent service marketplace
    - Cross-chain Agent interoperability
-
-## 3. Token Economics
-
-For detailed information about the Based Agents token economics, including supply distribution, fee structures, and value accrual mechanisms, please refer to our [Tokenomics documentation](./Tokenomics.md).
-
-### 3.1 Market Phases
-
-The Based Agents protocol implements a two-phase market system for Agent tokens:
-
-1. **Primary Market**
-   - Bonding curve mechanism for initial distribution
-   - Automated price discovery
-   - Predictable liquidity
-
-2. **Secondary Market**
-   - Transition through graduation process
-   - Trading on Uniswap V2
-   - Market-driven price discovery
-
-### 3.2 Value Drivers
-
-The protocol's value is driven by several key mechanisms:
-
-1. **Protocol Utility**
-   - Essential for Agent token creation and trading
-   - Required for market graduation
-   - Governance participation
-
-2. **Ecosystem Growth**
-   - Platform and order referral system
-   - Framework integrations
-   - Community development
-
-3. **Governance Rights**
-   - Protocol parameter control
-   - Treasury management
-   - Framework decisions
-
-For specific details about token distribution, fee structures, and economic parameters, please consult the [Tokenomics documentation](./Tokenomics.md).
 
 ## Conclusion
 
