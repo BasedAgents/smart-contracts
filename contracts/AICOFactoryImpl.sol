@@ -57,14 +57,14 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     }
 
     /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V2
-    /// @param _tokenCreator The address of the token creator
+    /// @param _agentCreator The address of the Agent creator
     /// @param _platformReferrer The address of the platform referrer
     /// @param _agentWallet The address of the agent wallet
     /// @param _tokenURI The ERC20z token URI
     /// @param _name The ERC20 token name
     /// @param _symbol The ERC20 token symbol
     function deploy(
-        address _tokenCreator,
+        address _agentCreator,
         address _platformReferrer,
         address _agentWallet,
         string memory _tokenURI,
@@ -77,12 +77,12 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         // Collect creation fee
         require(BAG.transferFrom(msg.sender, protocolFeeRecipient, agentCreationFee), "Creation fee transfer failed");
 
-        bytes32 tokenSalt = _generateSalt(_tokenCreator, _tokenURI);
+        bytes32 tokenSalt = _generateSalt(_agentCreator, _tokenURI);
 
         token = address(Clones.cloneDeterministic(tokenImplementation, tokenSalt));
         
         AICO(payable(token)).initialize{value: msg.value}(
-            _tokenCreator,
+            _agentCreator,
             _platformReferrer,
             bondingCurve,
             _agentWallet,
@@ -96,7 +96,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         
         AICOGovernor(payable(governor)).initialize(
             IVotesUpgradeable(token),
-            _tokenCreator,
+            _agentCreator,
             _votingDelay,
             _votingPeriod,
             _proposalThreshold
@@ -104,7 +104,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
 
         emit AICOTokenCreated(
             address(this),
-            _tokenCreator,
+            _agentCreator,
             _platformReferrer,
             AICO(payable(token)).protocolFeeRecipient(),
             bondingCurve,
@@ -118,7 +118,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         emit GovernorCreated(
             token,
             governor,
-            _tokenCreator,
+            _agentCreator,
             _votingDelay,
             _votingPeriod,
             _proposalThreshold
@@ -128,11 +128,11 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     }
 
     /// @dev Generates a unique salt for deterministic deployment
-    function _generateSalt(address _tokenCreator, string memory _tokenURI) internal view returns (bytes32) {
+    function _generateSalt(address _agentCreator, string memory _tokenURI) internal view returns (bytes32) {
         return keccak256(
             abi.encodePacked(
                 msg.sender,
-                _tokenCreator,
+                _agentCreator,
                 keccak256(abi.encodePacked(_tokenURI)),
                 block.coinbase,
                 block.number,

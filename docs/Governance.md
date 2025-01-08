@@ -72,12 +72,14 @@ The governance system consists of three main contracts working together:
 
 ## Governance Structure
 
-### Token Creator Powers
+### Agent Creator Powers
 1. **Initial Control** (Active at all market stages):
    - Exclusive proposal rights at deployment
    - Control over governance parameters
    - VetoContract Director role
    - Protocol parameter management
+   - Control over Agent's code repository visibility (public/private)
+   - Control over fund release logic and mechanisms
    - These powers are independent of market type (bonding curve or Uniswap)
 
 2. **Configuration Capabilities**:
@@ -86,27 +88,35 @@ The governance system consists of three main contracts working together:
    - Update protocol addresses
    - Configure proposal rights
    - Update governance parameters (voting delay, period, threshold)
+   - Define and modify fund release mechanisms
+   - Manage code repository access and visibility
 
 ### Proposal Rights System
 
 1. **Initial State**:
-   - Token creator has exclusive proposal rights
+   - Agent creator has exclusive proposal rights
    - Other addresses cannot create proposals
    - Proposals are closed by default
+   - Agent creator controls code visibility and fund release logic
+   - Token holders have veto rights over changes
 
 2. **Flexible Configuration**:
-   - Token creator can open proposals to all token holders via `updateProposalRights`
+   - Agent creator can open proposals to all token holders via `updateProposalRights`
    - Can set minimum token balance requirement for proposals
    - Can grant/revoke proposal rights to specific addresses via `setProposerRights`
+   - Can modify fund release mechanisms (subject to token holder veto)
+   - Can change code repository visibility (subject to token holder veto)
 
 3. **Access Control Modes**:
    - Exclusive Mode: Only explicitly authorized addresses can propose
    - Open Mode with Balance Requirement: Any address with sufficient tokens can propose
    - Fully Open Mode: Any token holder can propose
+   - All modes maintain Director control over code and fund release logic
+   - All modes include token holder veto rights
 
 ### Director Role
 The VetoContract Director:
-- Initially set to token creator
+- Initially set to Agent creator
 - Can veto proposed transactions during delay period
 - Replaceable through token holder governance
 - Acts as security backstop
@@ -154,16 +164,42 @@ When set, the governance contract can:
 
 ### Bonding Curve Stage
 - All governance capabilities are fully active
-- Token creator maintains full control over governance parameters
-- Token holders can participate in voting if granted proposal rights
+- Agent creator maintains full control over:
+  - Governance parameters
+  - Code repository visibility
+  - Fund release mechanisms
+  - Operational decisions
+- Token holders have veto rights over changes
 - VetoContract and DelayModule are operational
 
 ### Uniswap Pool Stage
 - Graduation to Uniswap does not affect governance capabilities
 - All governance mechanisms remain unchanged
-- Token creator retains same level of control
-- Token holders maintain their existing voting rights
+- Agent creator retains same level of control over:
+  - Code repository visibility (public/private)
+  - Fund release logic and mechanisms
+  - Operational parameters
+- Token holders maintain their veto rights
 - VetoContract and DelayModule continue to function as before
+
+### Code and Fund Management
+1. **Code Repository Control**:
+   - Director decides repository visibility (public/private)
+   - Director manages code access and updates
+   - Changes subject to token holder veto
+   - Visibility status transparent to token holders
+
+2. **Fund Release Mechanisms**:
+   - Director designs and implements fund control logic
+   - Can include automated rules or manual approvals
+   - Changes subject to token holder veto
+   - Mechanisms transparent to token holders
+
+3. **Operational Control**:
+   - Director maintains day-to-day operational control
+   - Can implement automated processes
+   - Can modify operational parameters
+   - Subject to token holder veto rights
 
 ## Events and Monitoring
 
@@ -190,7 +226,7 @@ When set, the governance contract can:
 ## Example Workflows
 
 ### Governance Transition
-1. Initial centralized state (token creator control)
+1. Initial centralized state (Agent creator control)
 2. Grant proposal rights to key stakeholders
 3. Enable minimum balance requirements
 4. Open proposals to all qualified token holders

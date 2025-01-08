@@ -28,11 +28,11 @@ contract AICOGovernor is
     GovernorVotesQuorumFractionUpgradeable,
     OwnableUpgradeable
 {
-    address public tokenCreator;
+    address public agentCreator;
 
     function initialize(
         IVotesUpgradeable _token, 
-        address _tokenCreator,
+        address _agentCreator,
         uint48 _votingDelay,      // e.g. 1 block
         uint32 _votingPeriod,     // e.g. 45818 blocks (~ 1 week)
         uint256 _proposalThreshold // e.g. 0 tokens
@@ -46,9 +46,9 @@ contract AICOGovernor is
         __GovernorCountingSimple_init();
         __GovernorVotes_init(_token);
         __GovernorVotesQuorumFraction_init(10); // 10% quorum
-        __Ownable_init(_tokenCreator);
+        __Ownable_init(_agentCreator);
 
-        tokenCreator = _tokenCreator;
+        agentCreator = _agentCreator;
     }
 
     // Override propose function to restrict proposal creation
@@ -58,10 +58,10 @@ contract AICOGovernor is
         bytes[] memory calldatas,
         string memory description
     ) public virtual override returns (uint256) {
-        // Only token creator can create proposals
+        // Only Agent creator can create proposals
         require(
-            msg.sender == tokenCreator, 
-            "AICOGovernor: Only token creator can create proposals"
+            msg.sender == agentCreator, 
+            "AICOGovernor: Only Agent creator can create proposals"
         );
         
         return super.propose(targets, values, calldatas, description);

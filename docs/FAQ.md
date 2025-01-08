@@ -96,11 +96,11 @@ For detailed information about token distribution and supply parameters, please 
 ### What can I control as a token holder?
 
 **As an Agent Token Holder:**
-- Agent's treasury and fund allocation
-- Agent's code and operational parameters
-- Agent's strategic direction and partnerships
-- Agent's operational rules and constraints
-- Agent's revenue model
+- Veto power over Agent's treasury transactions
+- Veto power over Agent's code and parameter changes
+- Veto power over Agent's strategic decisions
+- Veto power over operational rules and changes
+- Ability to transfer the Director role with sufficient votes
 
 **As a BAG Token Holder:**
 - Protocol-level parameters and contracts
@@ -116,7 +116,7 @@ Token holders are protected in several ways:
 - All governance parameters are public and visible before token purchase
 - Agent's governance system is encoded in smart contracts
 - Any changes to governance must be announced with delay periods
-- Full visibility of Agent's code and operations
+- Code visibility (public/private) is known before token purchase
 
 **Market Forces:**
 - Agent creators are incentivized to establish attractive governance systems
@@ -128,7 +128,7 @@ Token holders are protected in several ways:
 - Veto power over Director's actions
 - Ability to transfer Director role with sufficient votes
 - Mandatory delay periods before major changes
-- Protection of treasury through governance
+- Protection through veto rights over treasury actions
 
 **Governance Evolution:**
 - Token holders can see the planned governance roadmap

@@ -1,16 +1,16 @@
-# BasedAgents Whitepaper
+# Based Agents Whitepaper
 
 # Building the Universal Marketplace for AI Agents
 
 ## Abstract
 
-BasedAgents introduces the world's first comprehensive marketplace for autonomous AI agents—a platform designed to power the next generation of **billion-dollar autonomous organizations** with zero employees. Through our AI Coin Offering (AICO) Launchpad, we aim to become the "Amazon" of AI agents, unifying all major agent frameworks in a single ecosystem.
+Based Agents introduces the world's first comprehensive marketplace for autonomous AI agents—a platform designed to power the next generation of **billion-dollar autonomous organizations** with zero employees. Through our AI Coin Offering (AICO) Launchpad, we aim to become the "Amazon" of AI agents, unifying all major agent frameworks in a single ecosystem.
 
-The native $BAG token anchors our platform. Beyond its governance function, $BAG serves as the exclusive currency for creating and trading AI agent tokens, incorporating deflationary mechanisms through fees and graduation requirements to drive long-term value. By integrating platform and order referral incentives, we align the interests of developers, integrators, and the broader BasedAgents community.
+The native $BAG token anchors our platform. Beyond its governance function, $BAG serves as the exclusive currency for creating and trading AI agent tokens, incorporating deflationary mechanisms through fees and graduation requirements to drive long-term value. By integrating platform and order referral incentives, we align the interests of developers, integrators, and the broader Based Agents community.
 
 ## 1. Vision: A Future Powered by Autonomous Agents
 
-The rapid convergence of AI and blockchain presents a unique opportunity for autonomous organizations. These AI agents—capable of executing operations, scaling independently, and making data-driven decisions—will reshape how businesses function. BasedAgents implements a flexible governance framework that adapts to each Agent's specific needs while ensuring token holders maintain ultimate control over their Agent's treasury, code, and strategic direction.
+The rapid convergence of AI and blockchain presents a unique opportunity for autonomous organizations. These AI agents—capable of executing operations, scaling independently, and making data-driven decisions—will reshape how businesses function. Based Agents implements a flexible governance framework that adapts to each Agent's specific needs while ensuring token holders maintain ultimate control over their Agent's treasury, code, and strategic direction.
 
 ### 1.1 The AI Agent Revolution
 
@@ -44,38 +44,44 @@ The future of digital interactions will be dominated by AI Agents. We envision a
 
 ### 1.2 Real Utility, Not Meme Tokens
 
-Unlike most AI agent tokens in the market today, which function merely as speculative meme coins, Agent tokens on BasedAgents provide real governance power and utility:
+Unlike most AI agent tokens in the market today, which function merely as speculative meme coins, Agent tokens on Based Agents provide real governance power and utility through a balanced system of Director control and token holder oversight:
 
-1. **Direct Control Over Agent Assets**
-   - Token holders govern the Agent's treasury
-   - Control over fund allocation and spending
-   - Authority to approve or reject financial transactions
+1. **Agent Treasury and Fund Control**
+   - Director (Agent creator) has direct operational control over the Agent's treasury
+   - Token holders have veto power over financial transactions
+   - Director can propose and execute fund allocations
+   - Token holders can block concerning transactions through veto
 
 2. **Technical Governance**
-   - Power to upgrade the Agent's codebase
-   - Control over AI model selection and parameters
-   - Authority to modify the Agent's operational logic
+   - Director controls the Agent's codebase and can choose repository visibility
+   - Director manages AI model selection and parameters
+   - Director can modify the Agent's operational logic
+   - Token holders have veto power over technical changes
+   - Token holders can transfer the Director role with sufficient votes
 
 3. **Strategic Direction**
-   - Setting the Agent's objectives and KPIs
-   - Approving new integrations or partnerships
-   - Defining risk parameters and constraints
+   - Director sets the Agent's objectives and KPIs
+   - Director proposes new integrations or partnerships
+   - Director defines risk parameters and constraints
+   - Token holders can veto strategic changes
+   - Token holders can influence direction through market forces
 
 4. **Agent Rewards**
-   - 50% of all transaction fees go to the Agent's wallet
-   - Token holders control fee allocation through governance
-   - Ability to propose and vote on revenue models
+   - 50% of all transaction fees go to the Agent's Coinbase MPC Wallet
+   - Director controls wallet operations through governance
+   - Token holders have veto power over wallet transactions
+   - Token holders can vote to transfer Director role if needed
 
-This comprehensive governance model ensures that token holders have genuine control over their Agent's development, operations, and future direction—making these tokens true governance instruments rather than speculative assets.
+This governance model balances efficient operation with token holder protection. While the Director maintains operational control for agile development, token holders have strong oversight through veto powers and the ability to transfer the Director role. This makes these tokens true governance instruments with real utility, rather than purely speculative assets.
 
-## 2. BasedAgents: The Universal AI Agent Marketplace
+## 2. Based Agents: The Universal AI Agent Marketplace
 
-Rather than isolating efforts in a single framework, BasedAgents seeks to unify the entire AI agent ecosystem under one marketplace. Just as Amazon revolutionized retail by aggregating an enormous variety of goods, BasedAgents aims to consolidate the myriad agent frameworks into a single, intuitive launchpad and discovery hub.
+Rather than isolating efforts in a single framework, Based Agents seeks to unify the entire AI agent ecosystem under one marketplace. Just as Amazon revolutionized retail by aggregating an enormous variety of goods, Based Agents aims to consolidate the myriad agent frameworks into a single, intuitive launchpad and discovery hub.
 
 ### 2.1 Framework Ecosystem
 
 #### Current Implementation
-BasedAgents launches with support for the Eliza framework:
+Based Agents launches with support for the Eliza framework:
 - TypeScript-based architecture
 - Chain-compatible design
 - Highly extensible for diverse Agent types
@@ -191,4 +197,4 @@ For detailed information about governance mechanisms, voting parameters, and gov
 
 ## Conclusion
 
-BasedAgents provides a comprehensive platform for launching and trading AI agent tokens, with $BAG as the economic backbone. Through carefully designed tokenomics, referral incentives, and governance mechanisms, we create a sustainable ecosystem where Agent creators can launch their AI agents and communities can actively participate in their development and success. This isn't just another token platform—it's a marketplace where real AI agents are deployed, governed, and evolved by their stakeholders. 
+Based Agents provides a comprehensive platform for launching and trading AI agent tokens, with $BAG as the economic backbone. Through carefully designed tokenomics, referral incentives, and governance mechanisms, we create a sustainable ecosystem where Agent creators can launch their AI agents and communities can actively participate in their development and success. This isn't just another token platform—it's a marketplace where real AI agents are deployed, governed, and evolved by their stakeholders. 

@@ -3,8 +3,8 @@
 ## Current Implementation
 
 ### Token Creation
-1. Token creator deploys a new AICO token through the factory
-2. Token creator becomes the owner with governance rights (see Governance.md)
+1. Agent creator deploys a new AICO token through the factory
+2. Agent creator becomes the owner with governance rights (see Governance.md)
 3. Token holders receive ERC20Votes-compatible tokens
 
 ### Smart Contract Architecture
@@ -39,7 +39,7 @@
 
 ### Transaction Security Layer
 1. **DelayModule Integration**:
-   - Agent monitoring of `TransactionProposed` events
+   - Agent monitoring of transaction proposal events
    - Automated timing checks for execution windows
    - Integration with AgentKit for transaction execution
 
@@ -98,7 +98,7 @@
 ### Transaction Flow
 
 1. **Proposal Stage**:
-   - Transaction proposed via `proposeTransaction`
+   - Transaction proposed through governance
    - Agent monitors proposal via AgentKit
    - Event logged in monitoring system
 
@@ -132,7 +132,7 @@
 ## Market Graduation
 
 ### Pool Creation
-- The Uniswap V2 pool is created only when the token graduates from the bonding curve to Uniswap
+- The Uniswap V2 pool is created when the token graduates from the bonding curve
 - This happens when all 500M tokens from the primary market supply are sold
 - Pool creation is subsidized by the protocol through the PoolCreationSubsidy contract
 - The pool parameters are immutable and set during graduation
@@ -141,14 +141,14 @@
 - The protocol maintains a PoolCreationSubsidy contract with ETH balance
 - This contract pays for the gas costs of creating new Uniswap V2 pools
 - Only authorized AICO tokens can request pool creation through this contract
-- The subsidy removes the burden of pool creation costs from both token creators and buyers
+- The subsidy removes the burden of pool creation costs from both Agent creators and buyers
 
 ### Graduation Process
 1. All 500M tokens from primary market supply are sold
 2. Graduation fee (525 BAG) is charged
 3. Uniswap V2 pool is created and initialized using protocol's subsidy
 4. Initial liquidity is added to the pool
-5. Market type changes from BONDING_CURVE to UNISWAP_POOL
+5. Market type changes from bonding curve to Uniswap pool
 6. Trading continues on Uniswap with the remaining 200M token supply
 
 ### Gas Optimization
@@ -156,27 +156,5 @@
 - Pool creation costs are subsidized by the protocol
 - If a token never graduates (doesn't sell all 500M tokens), no gas is spent on pool creation
 - This optimization is especially important for tokens that may not reach graduation
-
-## Token Allocation
-
-### Initial Distribution
-- Total Supply: 1,000,000,000 tokens (1B)
-- Primary Market (Bonding Curve): 500,000,000 tokens (500M)
-- Secondary Market (Uniswap): 200,000,000 tokens (200M)
-- Agent Allocation: 300,000,000 tokens (300M)
-
-### Agent Allocation
-- 300M tokens are minted directly to the Agent's wallet at deployment
-- These tokens are available immediately for:
-  - Paying contributors
-  - Funding grants
-  - Other Agent operations
-- The Agent's wallet address is set during token deployment and cannot be changed
-
-### Market Graduation
-- The Uniswap V2 pool is created only when the token graduates from the bonding curve to Uniswap
-- This happens when all 500M tokens from the primary market supply are sold
-- Pool creation is subsidized by the protocol through the PoolCreationSubsidy contract
-- The pool parameters are immutable and set during graduation
 
 

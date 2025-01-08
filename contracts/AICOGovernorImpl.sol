@@ -30,8 +30,8 @@ contract AICOGovernorImpl is
     OwnableUpgradeable,
     UUPSUpgradeable
 {
-    /// @dev Token creator address that initially has exclusive proposal rights
-    address public tokenCreator;
+    /// @dev Agent creator address that initially has exclusive proposal rights
+    address public agentCreator;
 
     /// @dev Minimum token balance required to create proposals (0 means no minimum)
     uint256 public proposalMinimumBalance;
@@ -115,7 +115,7 @@ contract AICOGovernorImpl is
     }
 
     /// @notice Updates the proposal rights configuration
-    /// @dev Only callable by owner (token creator)
+    /// @dev Only callable by owner (Agent creator)
     /// @param _openProposals Whether any token holder can create proposals
     /// @param _minimumBalance Minimum token balance required for proposals
     function updateProposalRights(
@@ -128,7 +128,7 @@ contract AICOGovernorImpl is
     }
 
     /// @notice Grants or revokes proposal rights for a specific address
-    /// @dev Only callable by owner (token creator)
+    /// @dev Only callable by owner (Agent creator)
     /// @param account Address to update rights for
     /// @param hasRights Whether the address should have proposal rights
     function setProposerRights(address account, bool hasRights) external onlyOwner {
@@ -166,7 +166,7 @@ contract AICOGovernorImpl is
     }
 
     /// @notice Updates key governance parameters
-    /// @dev Only callable by contract owner (token creator)
+    /// @dev Only callable by contract owner (Agent creator)
     /// @param _votingDelay New voting delay
     /// @param _votingPeriod New voting period
     /// @param _proposalThreshold New proposal threshold

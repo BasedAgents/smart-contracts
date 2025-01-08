@@ -62,16 +62,17 @@ When an Agent token accumulates 42,000 BAG through the bonding curve:
 
 #### 2. Transaction Fees
 All Agent token transactions incur a 1% fee in BAG, distributed to:
-- Token Creator: 50% (5000 BPS)
+- Agent Wallet: 50% (5000 BPS)
 - Protocol Treasury: 25% (2500 BPS)
 - Platform Referrer: 10% (1000 BPS)
 - Order Referrer: 15% (1500 BPS)
 
 ##### Fee Distribution Explained
 
-**Token Creator (50%)**
-- Direct revenue to the Agent token creator
-- Incentivizes quality Agent launches and ongoing development
+**Agent Wallet (50%)**
+- Direct revenue to the Agent's Coinbase MPC Wallet
+- Used for Agent operations and development
+- Controlled through Agent governance
 - Paid automatically on every transaction
 
 **Protocol Treasury (25%)**

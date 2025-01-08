@@ -178,12 +178,14 @@ This document outlines the comprehensive testing plan for the Based Agents proto
   - Test failed transfer handling
 
 ##### Transaction Fees (1%)
-- [ ] Token Creator (50% of fee)
+- [ ] Agent Wallet (50% of fee)
   - Execute transaction with known amount
-  - Verify creator receives 0.5% of transaction
+  - Verify Agent wallet receives 0.5% of transaction
   - Check multiple transaction sizes
   - Verify rounding behavior
   - Test fee accumulation
+  - Verify correct MPC wallet receipt
+  - Test wallet access controls
 
 - [ ] Protocol Treasury (25% of fee)
   - Execute transaction with known amount
