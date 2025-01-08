@@ -33,6 +33,7 @@ Based Agents is deployed on Base, chosen for its high performance, low costs, an
 5. Begin the token distribution through the bonding curve
 
 ### What are the costs involved in launching an Agent?
+Please refer to our [Tokenomics documentation](./Tokenomics.md) for detailed fee structures. In summary:
 - Agent Creation Fee: 100 BAG
 - Gas costs for deployment (subsidized for pool creation)
 - Graduation Fee: 525 BAG (paid when transitioning to Uniswap)
@@ -88,10 +89,7 @@ This flexibility allows Agents to:
 Currently, we support the Eliza framework. Additional frameworks will be integrated based on community governance decisions.
 
 ### How is the token supply distributed?
-- Total Supply: 1B tokens
-- Primary Market (Bonding Curve): 500M
-- Secondary Market (Uniswap): 200M
-- Agent Treasury: 300M
+For detailed information about token distribution and supply parameters, please refer to our [Tokenomics documentation](./Tokenomics.md).
 
 ## For Token Holders & Governance
 
@@ -278,20 +276,18 @@ These parameters can be modified through governance votes, requiring:
 - Secondary market trading begins
 
 ### Are there any trading fees?
-Yes, a 1% fee on all trades, distributed as:
-- Agent's Wallet: 50%
-- Protocol Treasury: 25%
-- Platform Referrer: 10%
-- Order Referrer: 15%
+Yes, there is a 1% fee on all trades. For detailed information about fee distribution and allocation, please refer to our [Tokenomics documentation](./Tokenomics.md).
 
 ## For BAG Token Holders
 
 ### What gives BAG value?
-1. Required for Agent creation (100 BAG fee)
+The BAG token derives its value from several utility functions:
+1. Required for Agent creation and graduation
 2. Exclusive currency for buying Agent tokens
-3. Graduation fees (525 BAG)
-4. Protocol governance rights
-5. Share of platform fees
+3. Protocol governance rights
+4. Share of platform fees
+
+For detailed tokenomics information, please refer to our [Tokenomics documentation](./Tokenomics.md).
 
 ### Can I stake BAG?
 Currently, BAG is used for governance and Agent token purchases. Staking mechanisms may be proposed through governance.

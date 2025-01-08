@@ -267,6 +267,45 @@ This multi-layered governance approach ensures that while $BAG holders control t
    - Global Agent service marketplace
    - Cross-chain Agent interoperability
 
+## 3. Token Economics
+
+For detailed information about the Based Agents token economics, including supply distribution, fee structures, and value accrual mechanisms, please refer to our [Tokenomics documentation](./Tokenomics.md).
+
+### 3.1 Market Phases
+
+The Based Agents protocol implements a two-phase market system for Agent tokens:
+
+1. **Primary Market**
+   - Bonding curve mechanism for initial distribution
+   - Automated price discovery
+   - Predictable liquidity
+
+2. **Secondary Market**
+   - Transition through graduation process
+   - Trading on Uniswap V2
+   - Market-driven price discovery
+
+### 3.2 Value Drivers
+
+The protocol's value is driven by several key mechanisms:
+
+1. **Protocol Utility**
+   - Essential for Agent token creation and trading
+   - Required for market graduation
+   - Governance participation
+
+2. **Ecosystem Growth**
+   - Platform and order referral system
+   - Framework integrations
+   - Community development
+
+3. **Governance Rights**
+   - Protocol parameter control
+   - Treasury management
+   - Framework decisions
+
+For specific details about token distribution, fee structures, and economic parameters, please consult the [Tokenomics documentation](./Tokenomics.md).
+
 ## Conclusion
 
 BasedAgents provides a comprehensive platform for launching and trading AI agent tokens, with $BAG as the economic backbone. Through carefully designed tokenomics, referral incentives, and governance mechanisms, we create a sustainable ecosystem where Agent creators can launch their AI agents and communities can actively participate in their development and success. This isn't just another token platform—it's a marketplace where real AI agents are deployed, governed, and evolved by their stakeholders. 
