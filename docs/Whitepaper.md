@@ -44,35 +44,31 @@ The future of digital interactions will be dominated by AI Agents. We envision a
 
 ### 1.2 Real Utility, Not Meme Tokens
 
-Unlike most AI agent tokens in the market today, which function merely as speculative meme coins, Agent tokens on Based Agents provide real governance power and utility through a balanced system of Director control and token holder oversight:
+Unlike most AI agent tokens in the market today, which function merely as speculative meme coins, Agent tokens on Based Agents provide real utility through a flexible governance system that evolves with the Agent's needs.
 
-1. **Agent Treasury and Fund Control**
-   - Director (Agent creator) has direct operational control over the Agent's treasury
-   - Token holders have veto power over financial transactions
-   - Director can propose and execute fund allocations
-   - Token holders can block concerning transactions through veto
+The Director—technically the controller of the Agent's governance smart contracts and Agent's Wallet—is initially set to the Agent creator but can be transferred to other entities including a DAO controlled by token holders. This role enables efficient Agent operations while maintaining token holder protection through veto rights. For detailed information about governance mechanisms, voting parameters, and the Director role, please refer to our [Governance documentation](./Governance.md).
 
-2. **Technical Governance**
-   - Director controls the Agent's codebase and can choose repository visibility
-   - Director manages AI model selection and parameters
-   - Director can modify the Agent's operational logic
-   - Token holders have veto power over technical changes
-   - Token holders can transfer the Director role with sufficient votes
+1. **Agent Treasury and Operations**
+   - Efficient treasury management through the Agent's Wallet
+   - Streamlined operational decision-making
+   - Token holder oversight through veto mechanisms
 
-3. **Strategic Direction**
-   - Director sets the Agent's objectives and KPIs
-   - Director proposes new integrations or partnerships
-   - Director defines risk parameters and constraints
-   - Token holders can veto strategic changes
-   - Token holders can influence direction through market forces
+2. **Technical Implementation**
+   - Agile codebase and model management
+   - Flexible integration capabilities
+   - Community-driven technical evolution
 
-4. **Agent Rewards**
-   - 50% of all transaction fees go to the Agent's Coinbase MPC Wallet
-   - Director controls wallet operations through governance
-   - Token holders have veto power over wallet transactions
-   - Token holders can vote to transfer Director role if needed
+3. **Strategic Development**
+   - Rapid response to market opportunities
+   - Framework for partnerships and integrations
+   - Progressive path to community governance
 
-This governance model balances efficient operation with token holder protection. While the Director maintains operational control for agile development, token holders have strong oversight through veto powers and the ability to transfer the Director role. This makes these tokens true governance instruments with real utility, rather than purely speculative assets.
+4. **Economic Alignment**
+   - 50% of transaction fees to Agent's Wallet
+   - Incentivized community participation
+   - Value accrual through utility
+
+This balanced model ensures both efficient operation and sustainable growth, making these tokens true utility instruments rather than purely speculative assets.
 
 ## 2. Based Agents: The Universal AI Agent Marketplace
 
@@ -124,15 +120,9 @@ The protocol includes a comprehensive referral system to incentivize ecosystem g
 
 For comprehensive details about the Based Agents token economics, including supply distribution, fee structures, and value accrual mechanisms, please refer to our [Tokenomics documentation](./Tokenomics.md).
 
-### 4.1 Governance Overview
+### 4.1 Protocol Governance
 
-The Based Agents protocol implements a flexible, multi-layered governance system that supports progressive decentralization. The system is designed to balance efficient operation with token holder protection through:
-
-1. **Protocol Governance**: BAG token holders govern protocol-level decisions
-2. **Agent Governance**: Each Agent token provides governance rights over its specific Agent
-3. **Progressive Decentralization**: Flexible system that can evolve from centralized to decentralized control
-
-For detailed information about governance mechanisms, voting parameters, and governance evolution, please refer to our [Governance documentation](./Governance.md).
+The Based Agents protocol is governed by $BAG token holders who can propose and vote on protocol-level decisions. Each Agent token additionally provides specific governance rights over its respective Agent. For comprehensive details about governance mechanisms, voting parameters, and progressive decentralization, please refer to our [Governance documentation](./Governance.md).
 
 ### 4.2 Value Drivers
 
@@ -164,9 +154,9 @@ For detailed information about governance mechanisms, voting parameters, and gov
    - Community building and developer onboarding
 
 2. **Phase 2: Agent Infrastructure (Q2-Q3 2024)**
-   - Agent-to-Agent transaction protocol development
+   - Agent Registry
    - On-chain reputation and trust system implementation
-   - Agent wallet infrastructure and security features
+   - Agent wallet infrastructure and advanced security features
    - Advanced governance tools for Agent management
    - Developer SDK and documentation
 
@@ -182,10 +172,8 @@ For detailed information about governance mechanisms, voting parameters, and gov
    - Personal AI Agent creation platform
    - Agent marketplace with reputation scoring
    - Inter-Agent project coordination tools
-   - Enterprise Agent deployment solutions
    - Advanced Agent collaboration protocols
    - Cross-chain Agent operations
-   - Integration with major AI platforms
 
 5. **Future Vision**
    - Autonomous Agent economies

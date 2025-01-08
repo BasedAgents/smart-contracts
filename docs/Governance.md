@@ -1,12 +1,78 @@
-# AICO Protocol Governance
+# Based Agents Governance
 
 ## Overview
-The AICO Protocol implements a flexible governance system that can evolve from centralized to decentralized control, with built-in security mechanisms and configurable proposal rights. All governance capabilities described in this document are active immediately upon token deployment and remain unchanged throughout the token's lifecycle, including both before and after graduation to Uniswap. The market graduation process only affects the trading mechanism (from bonding curve to Uniswap pool) and does not impact any governance capabilities.
+Based Agents implements two distinct layers of governance:
+1. Protocol Governance: Initially controlled by Community Multisig, transitioning to Genesis Agent governance
+2. Agent Governance: Each Agent token provides governance over its specific Agent
 
-## Governance Architecture
+## 1. Protocol Governance ($BAG)
+
+### Structure
+Protocol governance follows a progressive path toward full decentralization:
+
+1. **Initial Phase: Community Multisig**
+   - A trusted group of community members controls protocol operations
+   - Handles token grants and community rewards
+   - Manages token burns and emissions
+   - Controls protocol parameter updates
+   - May implement token holder voting for key decisions
+
+2. **Transition Phase: Genesis Agent**
+   - The Genesis Agent is the first and most important Agent on the platform
+   - Will gradually assume control of protocol governance from the Community Multisig
+   - Controlled by $BAG token holders through governance
+   - Powers transferred progressively as Genesis Agent proves stability
+   - Represents the ultimate form of dogfooding - an AI Agent governing an AI Agent protocol
+
+3. **Vote Delegation**
+   - $BAG implements ERC20Votes for efficient governance
+   - Token holders can delegate voting power to active community members
+   - Delegates vote on behalf of their delegators
+   - Reduces governance overhead for passive holders
+   - Enables more active and engaged governance
+
+### Governance Powers
+The protocol-level governance (initially Multisig, later Genesis Agent) can:
+- Vote on protocol upgrades and parameters
+- Control framework integrations
+- Manage protocol fees and revenue
+- Guide protocol development and roadmap
+- Propose and vote on protocol improvements
+
+### Voting Parameters
+- Voting Period: 7 days
+- Quorum: 20% of total $BAG supply
+- Threshold: >66% of votes in favor
+- Delay Period: 48 hours
+
+### Proposal Types
+1. **Protocol Upgrades**
+   - Smart contract upgrades
+   - Security parameter changes
+   - Framework integrations
+
+2. **Economic Parameters**
+   - Fee structures
+   - Revenue distribution
+   - Market mechanisms
+
+3. **Strategic Decisions**
+   - Roadmap priorities
+   - Framework partnerships
+   - Major feature releases
+
+4. **Genesis Agent Control**
+   - Approval of power transfers from Multisig to Genesis Agent
+   - Genesis Agent parameter updates
+   - Genesis Agent strategic decisions
+
+## 2. Agent Governance
+
+### Overview
+Each Agent token launched as an AICO (AI Coin Offering) provides governance rights over its specific Agent through a flexible system that can evolve from centralized to decentralized control.
 
 ### Contract Structure
-The governance system consists of three main contracts working together:
+The Agent governance system consists of three main contracts:
 
 1. **AICOGovernor**:
    - Handles standard governance operations
@@ -26,123 +92,54 @@ The governance system consists of three main contracts working together:
    - Ensures time for community review
    - Prevents rushed changes
 
-### Voting Parameters
+### Director Role
+The Director—owner of the Agent's governance contracts and Wallet—has operational control:
+1. **Initial Control**
+   - Exclusive proposal rights at deployment
+   - Control over governance parameters
+   - VetoContract Director role
+   - Protocol parameter management
+   - Control over Agent's code repository visibility
+   - Control over fund release logic
 
-1. **Standard Veto Actions** (Through VetoContract):
+2. **Configuration Capabilities**
+   - Update protocol parameters
+   - Set governance contract
+   - Update protocol addresses
+   - Configure proposal rights
+   - Update governance parameters
+   - Define fund release mechanisms
+
+### Token Holder Rights
+1. **Standard Veto Actions**
    - Voting Period: 72 hours
    - Quorum: 10% of total token supply
    - Threshold: >50% of votes in favor
    - Delay Period: 24 hours
    - Use Case: Regular operational decisions
 
-2. **Critical System Changes** (Through AICOGovernor):
+2. **Critical Changes**
    - Voting Period: 7 days
    - Quorum: 20% of total token supply
    - Threshold: >66% of votes in favor
    - Delay Period: 48 hours
    - Use Case: Director transfers, fundamental changes
 
-## Governance Risks
+### Progressive Decentralization
+The governance system supports evolution through:
 
-### Potential Gridlock Scenarios
-
-1. **Quorum Failures**:
-   - Large token holder inactivity could prevent reaching quorum
-   - Particularly risky for critical changes requiring 20% quorum
-   - Can block necessary upgrades or improvements
-   - Mitigation: Active community engagement and delegation
-
-2. **Competing Interests**:
-   - Director proposing changes vs token holders vetoing
-   - Could lead to operational paralysis
-   - May prevent timely responses to opportunities/threats
-   - Mitigation: Clear communication and compromise
-
-3. **Time-Critical Situations**:
-   - Mandatory delay periods could block urgent actions
-   - 24-48 hour delays might miss market opportunities
-   - No bypass mechanism for emergencies
-   - Mitigation: Proper planning and preventive measures
-
-4. **Token Distribution Impact**:
-   - Concentrated token holdings could control vetoes
-   - Fragmented holdings might struggle to reach quorum
-   - Whale influence on critical decisions
-   - Mitigation: Balanced token distribution and anti-whale measures
-
-## Governance Structure
-
-### Agent Creator Powers
-1. **Initial Control** (Active at all market stages):
-   - Exclusive proposal rights at deployment
-   - Control over governance parameters
-   - VetoContract Director role
-   - Protocol parameter management
-   - Control over Agent's code repository visibility (public/private)
-   - Control over fund release logic and mechanisms
-   - These powers are independent of market type (bonding curve or Uniswap)
-
-2. **Configuration Capabilities**:
-   - Update protocol parameters via `upgradeParameters`
-   - Set governance contract via `setGovernanceContract`
-   - Update protocol addresses
-   - Configure proposal rights
-   - Update governance parameters (voting delay, period, threshold)
-   - Define and modify fund release mechanisms
-   - Manage code repository access and visibility
-
-### Proposal Rights System
-
-1. **Initial State**:
-   - Agent creator has exclusive proposal rights
-   - Other addresses cannot create proposals
-   - Proposals are closed by default
-   - Agent creator controls code visibility and fund release logic
-   - Token holders have veto rights over changes
-
-2. **Flexible Configuration**:
-   - Agent creator can open proposals to all token holders via `updateProposalRights`
-   - Can set minimum token balance requirement for proposals
-   - Can grant/revoke proposal rights to specific addresses via `setProposerRights`
-   - Can modify fund release mechanisms (subject to token holder veto)
-   - Can change code repository visibility (subject to token holder veto)
-
-3. **Access Control Modes**:
-   - Exclusive Mode: Only explicitly authorized addresses can propose
-   - Open Mode with Balance Requirement: Any address with sufficient tokens can propose
-   - Fully Open Mode: Any token holder can propose
-   - All modes maintain Director control over code and fund release logic
-   - All modes include token holder veto rights
-
-### Director Role
-The VetoContract Director:
-- Initially set to Agent creator
-- Can veto proposed transactions during delay period
-- Replaceable through token holder governance
-- Acts as security backstop
-- Separate from general governance voting
-
-### Governance Contract
-When set, the governance contract can:
-- Update protocol parameters
-- Update protocol addresses
-- Implement additional governance logic
-
-## Governance Evolution
-
-### Transition Capabilities
-1. **Proposal Rights**:
+1. **Proposal Rights**
    - Can be opened to all token holders
    - Can implement minimum balance requirements
    - Can be granted to specific addresses
 
-2. **Voting Parameters**:
+2. **Voting Parameters**
    - Adjustable voting delay
    - Configurable voting period
    - Modifiable proposal threshold
    - Adjustable quorum requirements
 
-3. **Role Transfers**:
+3. **Role Transfers**
    - Director role can transfer to:
      - Multi-sig wallet
      - DAO
@@ -150,100 +147,39 @@ When set, the governance contract can:
    - Governance contract can be upgraded
 
 ### Implementation Mechanisms
-1. **Parameter Updates**:
+1. **Parameter Updates**
    - `updateGovernanceParameters`: Modify voting settings
    - `updateProposalRights`: Change proposal access
    - `setProposerRights`: Manage individual rights
 
-2. **Contract Upgrades**:
+2. **Contract Upgrades**
    - UUPS upgradeable pattern
    - Can implement new governance models
    - Can add custom voting strategies
 
-## Market Stages and Governance
+## Governance Risks
 
-### Bonding Curve Stage
-- All governance capabilities are fully active
-- Agent creator maintains full control over:
-  - Governance parameters
-  - Code repository visibility
-  - Fund release mechanisms
-  - Operational decisions
-- Token holders have veto rights over changes
-- VetoContract and DelayModule are operational
+### Potential Gridlock Scenarios
+1. **Quorum Failures**
+   - Large token holder inactivity could prevent reaching quorum
+   - Particularly risky for critical changes requiring 20% quorum
+   - Can block necessary upgrades or improvements
+   - Mitigation: Active community engagement and delegation
 
-### Uniswap Pool Stage
-- Graduation to Uniswap does not affect governance capabilities
-- All governance mechanisms remain unchanged
-- Agent creator retains same level of control over:
-  - Code repository visibility (public/private)
-  - Fund release logic and mechanisms
-  - Operational parameters
-- Token holders maintain their veto rights
-- VetoContract and DelayModule continue to function as before
+2. **Competing Interests**
+   - Director proposing changes vs token holders vetoing
+   - Could lead to operational paralysis
+   - May prevent timely responses to opportunities/threats
+   - Mitigation: Clear communication and compromise
 
-### Code and Fund Management
-1. **Code Repository Control**:
-   - Director decides repository visibility (public/private)
-   - Director manages code access and updates
-   - Changes subject to token holder veto
-   - Visibility status transparent to token holders
+3. **Time-Critical Situations**
+   - Mandatory delay periods could block urgent actions
+   - 24-48 hour delays might miss market opportunities
+   - No bypass mechanism for emergencies
+   - Mitigation: Proper planning and preventive measures
 
-2. **Fund Release Mechanisms**:
-   - Director designs and implements fund control logic
-   - Can include automated rules or manual approvals
-   - Changes subject to token holder veto
-   - Mechanisms transparent to token holders
-
-3. **Operational Control**:
-   - Director maintains day-to-day operational control
-   - Can implement automated processes
-   - Can modify operational parameters
-   - Subject to token holder veto rights
-
-## Events and Monitoring
-
-### Governance Events
-1. **Proposal Rights**:
-   - `ProposalRightsUpdated`: Configuration changes
-   - `ProposerRightsUpdated`: Individual permission changes
-
-2. **General Governance**:
-   - `GovernanceContractUpdated`: Contract changes
-   - Standard Governor events for proposals and voting
-
-### Security Measures
-1. **Time Locks**:
-   - Voting delay period
-   - Execution delay
-   - Veto window
-
-2. **Access Controls**:
-   - Proposal rights management
-   - Director veto power
-   - Governance parameter protection
-
-## Example Workflows
-
-### Governance Transition
-1. Initial centralized state (Agent creator control)
-2. Grant proposal rights to key stakeholders
-3. Enable minimum balance requirements
-4. Open proposals to all qualified token holders
-5. Transfer Director role to community governance
-
-### Proposal Lifecycle
-1. **Creation**:
-   - Check proposal rights
-   - Submit proposal details
-   - Start voting delay
-
-2. **Voting**:
-   - Token holders cast votes
-   - Track quorum progress
-   - Monitor voting period
-
-3. **Execution**:
-   - Verify proposal passed
-   - Check veto status
-   - Execute approved actions 
+4. **Token Distribution Impact**
+   - Concentrated token holdings could control vetoes
+   - Fragmented holdings might struggle to reach quorum
+   - Whale influence on critical decisions
+   - Mitigation: Balanced token distribution and anti-whale measures 
