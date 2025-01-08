@@ -114,9 +114,9 @@ Security researchers participating in this bug bounty program will not be subjec
 ## Contact
 
 - Bug Submission: [Secure Platform URL]
-- Email: security@basedagents.xyz
-- Discord: [Discord Channel]
-- Telegram: [Telegram Group]
+- Email: legal@basedagents.co
+- Discord: https://discord.gg/m2Qud5GDqp
+- Telegram: https://t.me/+KBcAFhxm5SA0NjY9
 
 ## Hall of Fame
 
