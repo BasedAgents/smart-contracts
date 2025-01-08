@@ -10,15 +10,17 @@ The BAG token is the native token of the Based Agents ecosystem, powering the en
 
 ### Total Supply and Distribution
 - Total Supply: 1,000,000,000 BAG (1B tokens)
-- Distribution:
-  - Based Agents DAO / Genesis Agent: 35% (350M BAG)
-    - Initially managed by Community Multisig
-    - Progressive transition of functions to Genesis Agent
-    - Can periodically burn BAG tokens received from Protocol Treasury
-  - Liquidity Providers: 35% (350M BAG)
-    - Ensures deep liquidity for protocol operations
-  - Ecosystem Fund (AI3 Agent): 30% (300M BAG)
-    - Supports ecosystem growth and development
+
+| Category | Allocation | Amount | Notes |
+|----------|------------|--------|-------|
+| Genesis Agent | 35% | 350M | Initially managed by Community Multisig |
+| Liquidity Providers | 35% | 350M | |
+| └ Initial LPs/Team | 29% | 290M | 36-month linear vesting |
+| └ Secondary LPs | 1% | 10M | 3-12 month vesting based on entry price |
+| └ Public LP Rewards | 5% | 50M | Open participation program |
+| AI3 Agent | 30% | 300M | 50% distributed to BAG/ETH LPs |
+
+For detailed information about the Genesis Agent and AI3 Agent, please refer to [Ecosystem Agents](./EcosystemAgents.md).
 
 ### Economic Model
 
@@ -70,9 +72,8 @@ All Agent token transactions incur a 1% fee in BAG, distributed to:
 ##### Fee Distribution Explained
 
 **Agent Wallet (50%)**
-- Direct revenue to the Agent's Coinbase MPC Wallet
+- Direct revenue to the Agent's Wallet
 - Used for Agent operations and development
-- Controlled through Agent governance
 - Paid automatically on every transaction
 
 **Protocol Treasury (25%)**
@@ -104,17 +105,14 @@ The Platform Referrer fee incentivizes the development of any integration that e
 The Order Referrer system enables community-driven growth through a referral program:
 - Anyone can become an Order Referrer by sharing their referral address
 - Referrers earn 15% of the transaction fee when:
-  - A user buys Agent tokens using their referral code
-  - A user sells Agent tokens using their referral code
-  - The referred user makes any subsequent trades
+  - A user makes any trade using their referral code
+  - All subsequent trades by that user will generate referral fees
 - Example:
   - On a 1000 BAG trade (1% fee = 10 BAG):
     - Referrer earns 1.5 BAG (15% of fee)
-    - This applies to every trade the referred user makes
-  - Referral relationship is permanent for that Agent token
-  - Referrers can promote multiple Agent tokens
-  - Each trade specifies the referrer address
-  - If no referrer is specified, the fee goes to Protocol Treasury
+    - This applies to all future trades by the referred user
+- Each trade specifies the referrer address
+- If no referrer is specified, the fee goes to Protocol Treasury
 
 #### 3. Graduation Fees
 525 BAG fee upon market graduation, following the same distribution as transaction fees
