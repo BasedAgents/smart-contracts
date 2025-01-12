@@ -10,7 +10,7 @@ contract DelayModule is IDelayModule, Ownable {
     uint256 public delayDuration;
     mapping(bytes32 => uint256) public proposedAt;
 
-    constructor(address _vetoContract, uint256 _delayDuration) {
+    constructor(address _vetoContract, uint256 _delayDuration) Ownable(msg.sender){
         vetoContract = IVetoContract(_vetoContract);
         delayDuration = _delayDuration;
     }

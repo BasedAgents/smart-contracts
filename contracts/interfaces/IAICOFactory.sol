@@ -29,6 +29,7 @@ interface IAICOFactory {
     function deploy(
         address _tokenCreator,
         address _platformReferrer,
+        address _agentWallet,
         string memory _tokenURI,
         string memory _name,
         string memory _symbol,

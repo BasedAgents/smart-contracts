@@ -288,7 +288,7 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
     /// @notice Creates the Uniswap V2 pool during market graduation
     function _createAndInitializePool() internal returns (address pair) {
         // Use the subsidy contract to create the pool
-        pair = PoolCreationSubsidy(poolCreationSubsidy).createPool(address(this), WETH);
+        pair = PoolCreationSubsidy(payable(poolCreationSubsidy)).createPool(address(this), WETH);
         
         poolAddress = pair;
         return pair;

@@ -75,7 +75,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         uint256 _proposalThreshold
     ) external payable nonReentrant returns (address token, address governor) {
         // Collect creation fee
-        require(BAG.transferFrom(msg.sender, protocolFeeRecipient, agentCreationFee), "Creation fee transfer failed");
+        require(BAG.transferFrom(msg.sender, AICO(payable(token)).protocolFeeRecipient(), agentCreationFee), "Creation fee transfer failed");
 
         bytes32 tokenSalt = _generateSalt(_agentCreator, _tokenURI);
 

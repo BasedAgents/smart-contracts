@@ -119,35 +119,6 @@ interface IAICO {
         uint256 _secondarySupply
     );
 
-    // Function declarations remain the same but interface name changes from IBag to IAICO
-    function buy(
-        address recipient,
-        address refundRecipient,
-        address orderReferrer,
-        string memory comment,
-        MarketType expectedMarketType,
-        uint256 minOrderSize,
-        uint160 sqrtPriceLimitX96
-    ) external payable returns (uint256);
-
-    function sell(
-        uint256 tokensToSell,
-        address recipient,
-        address orderReferrer,
-        string memory comment,
-        MarketType expectedMarketType,
-        uint256 minPayoutSize,
-        uint160 sqrtPriceLimitX96
-    ) external returns (uint256);
-
-    function burn(uint256 tokensToBurn) external;
-
-    function getEthBuyQuote(uint256 amount) external view returns (uint256);
-
-    function getTokenSellQuote(uint256 amount) external view returns (uint256);
-
-    function state() external view returns (MarketState memory);
-
     function tokenURI() external view returns (string memory);
 
     function tokenCreator() external view returns (address);

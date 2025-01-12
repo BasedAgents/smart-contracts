@@ -6,7 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VetoContract is IVetoContract, Ownable {
     mapping(bytes32 => bool) public vetoedTransactions;
+    constructor() Ownable(msg.sender){
 
+    }
     function vetoTransaction(bytes32 txHash) external override onlyOwner {
         vetoedTransactions[txHash] = true;
         emit TransactionVetoed(txHash);

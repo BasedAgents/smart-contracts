@@ -36,6 +36,9 @@ contract AICOGovernorImpl is
     /// @dev Minimum token balance required to create proposals (0 means no minimum)
     uint256 public proposalMinimumBalance;
 
+    ///@dev Token creator address
+    address public tokenCreator;
+
     /// @dev Whether any token holder can create proposals
     bool public openProposals;
 

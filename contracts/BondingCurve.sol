@@ -2,6 +2,7 @@
 pragma solidity ^0.8.23;
 
 import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /* 
@@ -14,7 +15,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
     AICO        AICO        AICO    
 */
-contract BondingCurve {
+contract BondingCurve is OwnableUpgradeable {
     using FixedPointMathLib for uint256;
     using FixedPointMathLib for int256;
 
@@ -33,11 +34,12 @@ contract BondingCurve {
     uint256 public A;
     uint256 public B;
 
-    constructor(address _bagToken) {
+    constructor(address _bagToken, address _tokenCreator) {
         BAG = IERC20(_bagToken);
+         __Ownable_init(_tokenCreator);
     }
 
-    function getBAGSellQuote(uint256 currentSupply, uint256 bagOrderSize) external pure returns (uint256) {
+    function getBAGSellQuote(uint256 currentSupply, uint256 bagOrderSize) external view returns (uint256) {
         uint256 deltaY = bagOrderSize;
         uint256 x0 = currentSupply;
         uint256 exp_b_x0 = uint256((int256(B.mulWad(x0))).expWad());
@@ -49,7 +51,7 @@ contract BondingCurve {
         return tokensToSell;
     }
 
-    function getTokenSellQuote(uint256 currentSupply, uint256 tokensToSell) external pure returns (uint256) {
+    function getTokenSellQuote(uint256 currentSupply, uint256 tokensToSell) external view returns (uint256) {
         if (currentSupply < tokensToSell) revert InsufficientLiquidity();
         uint256 x0 = currentSupply;
         uint256 x1 = x0 - tokensToSell;
@@ -63,7 +65,7 @@ contract BondingCurve {
         return deltaY;
     }
 
-    function getBAGBuyQuote(uint256 currentSupply, uint256 bagOrderSize) external pure returns (uint256) {
+    function getBAGBuyQuote(uint256 currentSupply, uint256 bagOrderSize) external view returns (uint256) {
         uint256 x0 = currentSupply;
         uint256 deltaY = bagOrderSize;
 
@@ -78,7 +80,7 @@ contract BondingCurve {
         return deltaX;
     }
 
-    function getTokenBuyQuote(uint256 currentSupply, uint256 tokenOrderSize) external pure returns (uint256) {
+    function getTokenBuyQuote(uint256 currentSupply, uint256 tokenOrderSize) external view returns (uint256) {
         uint256 x0 = currentSupply;
         uint256 x1 = tokenOrderSize + currentSupply;
 
@@ -95,4 +97,5 @@ contract BondingCurve {
         B = _B;
         emit CurveParametersUpdated(A, B);
     }
+    event CurveParametersUpdated(uint256 _A, uint256 _B);
 }
