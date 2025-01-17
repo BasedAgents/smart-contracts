@@ -18,6 +18,32 @@ Our system uses two types of contract deployments:
    - No proxy needed as they serve as blueprints for future deployments
    - Used by: AICO Token and AICOGovernor
 
+### Implications of Non-Upgradeable Templates
+
+The AICO Token and AICOGovernor implementations serve as templates that are cloned for each new Agent. This design choice has important implications:
+
+1. **Individual Agent Tokens/Governors Cannot Be Upgraded**:
+   - Once an Agent's token and governor are deployed, their logic is immutable
+   - This provides strong security guarantees to token holders
+   - Agent creators cannot modify the rules after deployment
+   - All Agents operate under the same fixed ruleset
+
+2. **System-Wide Updates**:
+   - To update the logic for future Agents, a new implementation is deployed
+   - The AICOFactory is upgraded to point to the new implementation
+   - Existing Agents continue using their original implementation
+   - New Agents use the updated implementation
+
+3. **Security Benefits**:
+   - Token holders are protected from potential malicious upgrades
+   - The governance system's rules cannot be changed after deployment
+   - Provides stronger guarantees for long-term token holders
+
+4. **Trade-offs**:
+   - Cannot fix bugs in existing Agent contracts
+   - Cannot add new features to existing Agents
+   - Each major version change creates a split in the Agent ecosystem
+
 ## Core Contracts
 
 ### BondingCurve
