@@ -46,25 +46,34 @@ The AICO Token and AICOGovernor implementations serve as templates that are clon
 
 ## Core Contracts
 
+### VetoContract
+- Address: `0x7e95C26Db503Da6591E013bA023f48e3460c2412` ✅
+
+### DelayModule
+- Address: `0x40aFF0fDF2D35E2D670c24377F75C7918E2E5031` ✅
+
+### ProtocolRewards
+- Address: `0xB7168EDD8be601BFF6B93e6b0c06e70Df32Fcb78` ✅
+
 ### BondingCurve
-- Proxy: `0x0F8231577Be6362a6B78583eA03d3FDbCA3dfC68`
-- Implementation: `0x9c2851c615085D3AAe935EE7EbE0417Bc043C355`
+- Proxy: `0xC323B369b7F1fe341BCCca0236fa9EA1cB119320`
+- Implementation: `0x9c2851c615085D3AAe935EE7EbE0417Bc043C355` ✅
 
 ### PoolCreationSubsidy
-- Proxy: `0x393F87E29B44A04Bd6Bf9E4DB00Ad545b5b06879`
-- Implementation: `0x63c0b36672ba73fdB0A1317711bF98De1dDD22f6`
+- Proxy: `0xaBCeB7766464f0A57A9A477366339f727728c7B2`
+- Implementation: `0x63c0b36672ba73fdB0A1317711bF98De1dDD22f6` ✅
 
 ### AICO Token
-- Implementation: `0xa9F491f7f446829dEE9127B79Ed2EADAA3742A60`
+- Implementation: `0x22eaa14ba6C32495f8961B3dfD14A17531f74243` ✅
 (Template contract - new instances are cloned for each Agent)
 
 ### AICOGovernor
-- Implementation: `0x134A6fE08a524B346569585d36E3Fc206BE1399C`
+- Implementation: `0x35d5FF6592FCF17F574c4702417ca0b627EC1C55` ✅
 (Template contract - new instances are cloned for each Agent)
 
 ### AICOFactory
-- Proxy: `0xe818983aAC79AFb69C39b7ec19d1EC67b90452Ff`
-- Implementation: `0xb38be1A050a6a3B83Ad1eFBd353A72168730FeBf`
+- Proxy: `0x148eea31e41371eFf65E9816a8d95Fc936DDF2E6`
+- Implementation: `0xb38be1A050a6a3B83Ad1eFBd353A72168730FeBf` ✅
 
 ## External Contract References
 
@@ -80,6 +89,9 @@ The AICO Token and AICOGovernor implementations serve as templates that are clon
 ## Contract Verification Status
 
 The following contracts have been verified on Sepolia Etherscan:
+- VetoContract ✅
+- DelayModule ✅
+- ProtocolRewards ✅
 - BAG Token Implementation ✅
 - BondingCurve Implementation ✅
 - PoolCreationSubsidy Implementation ✅
