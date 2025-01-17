@@ -1,40 +1,43 @@
+const hre = require("hardhat");
 const { ethers, upgrades } = require("hardhat");
 
 async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("Deploying BAG Token with account:", deployer.address);
 
-    // Deploy BAG Token
+    // Deploy BAG Token as upgradeable
+    console.log("\nDeploying BAG Token...");
     const BAGToken = await ethers.getContractFactory("BAGToken");
-    console.log("Deploying BAG Token...");
-    
-    const token = await upgrades.deployProxy(
+    const bagToken = await upgrades.deployProxy(
         BAGToken,
-        [
-            "BAG Token",     // _name
-            "BAG",          // _symbol
-            deployer.address // _owner
-        ],
-        {
+        ["BAG Token", "BAG", deployer.address],
+        { 
             initializer: "initialize",
-            kind: "uups",
+            kind: "uups"
         }
     );
+    await bagToken.waitForDeployment();
+    const bagTokenAddress = await bagToken.getAddress();
+    console.log("BAG Token proxy deployed to:", bagTokenAddress);
 
-    await token.waitForDeployment();
-    const tokenAddress = await token.getAddress();
+    // Get implementation address
+    const implAddress = await upgrades.erc1967.getImplementationAddress(bagTokenAddress);
+    console.log("BAG Token implementation deployed to:", implAddress);
 
-    console.log("\nDeployment Results:");
-    console.log("BAG Token proxy deployed to:", tokenAddress);
-    console.log("Implementation address:", await upgrades.erc1967.getImplementationAddress(tokenAddress));
-    
-    // Log configuration
-    console.log("\nToken Configuration:");
-    console.log("Total Supply:", ethers.formatUnits(await token.totalSupply(), 18), "tokens");
-    console.log("Owner:", await token.owner());
+    // Wait a few blocks before verification
+    console.log("\nWaiting 30 seconds before verification...");
+    await new Promise(resolve => setTimeout(resolve, 30000));
 
-    console.log("\nVerification command:");
-    console.log(`npx hardhat verify --network sepolia ${await upgrades.erc1967.getImplementationAddress(tokenAddress)}`);
+    // Verify the implementation
+    try {
+        await hre.run("verify:verify", {
+            address: implAddress,
+            constructorArguments: []
+        });
+        console.log("BAG Token implementation verified");
+    } catch (error) {
+        console.error("Error verifying BAG Token:", error);
+    }
 }
 
 main()
