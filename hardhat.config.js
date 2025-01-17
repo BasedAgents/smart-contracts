@@ -1,25 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
+require("dotenv").config();
 let secret = require("./secret");
 
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
+/** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-	networks: {
-		hardhat: {
-			forking: {
-				url: secret.url,
-			},
-		},
-		localhost: {
-			url: "http://127.0.0.1:8545"
-		},
-		sepolia: {
-			url: secret.url,
-			accounts: [secret.key]
-		},
-	},
 	solidity: {
 		compilers: [
 			{
@@ -38,8 +23,25 @@ module.exports = {
 						}
 					}
 				}
+			},
+			{
+				version: "0.8.23",
+				settings: {
+					viaIR: true,
+					optimizer: {
+						enabled: true,
+						runs: 1000,
+						details: {
+							yul: true,
+							yulDetails: {
+								stackAllocation: true,
+								optimizerSteps: "dhfoDgvulfnTUtnIf"
+							}
+						}
+					}
+				}
 			}
-		],
+		]
 	},
 	paths: {
 		sources: "./contracts",
@@ -47,8 +49,12 @@ module.exports = {
 		cache: "./cache",
 		artifacts: "./artifacts"
 	},
-	mocha: {
-		timeout: 500000
+	networks: {
+		sepolia: {
+			url: secret.url,
+			accounts: [secret.key],
+			chainId: 11155111
+		}
 	},
 	etherscan: {
 		apiKey: {

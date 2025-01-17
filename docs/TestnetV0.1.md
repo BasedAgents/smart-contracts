@@ -61,7 +61,8 @@ The AICO Token and AICOGovernor implementations serve as templates that are clon
 
 ### PoolCreationSubsidy
 - Proxy: `0xaBCeB7766464f0A57A9A477366339f727728c7B2`
-- Implementation: `0x63c0b36672ba73fdB0A1317711bF98De1dDD22f6` ✅
+- Implementation: `0x24f5E201691F112e348092304cf65077E190866C` ✅
+- Role: Covers all pool creation costs, removing the need for Agent creators to pay ETH
 
 ### AICO Token
 - Implementation: `0x22eaa14ba6C32495f8961B3dfD14A17531f74243` ✅
@@ -73,7 +74,8 @@ The AICO Token and AICOGovernor implementations serve as templates that are clon
 
 ### AICOFactory
 - Proxy: `0x148eea31e41371eFf65E9816a8d95Fc936DDF2E6`
-- Implementation: `0xb38be1A050a6a3B83Ad1eFBd353A72168730FeBf` ✅
+- Implementation: `0x24f5E201691F112e348092304cf65077E190866C` ✅
+- Note: Agent creators only need to pay the initial 100 BAG creation fee
 
 ## External Contract References
 
@@ -104,4 +106,14 @@ The following contracts have been verified on Sepolia Etherscan:
 - The AICOFactory contract uses the AICO Token and AICOGovernor implementations as templates to clone new instances for each Agent
 - The BondingCurve contract handles the initial token distribution phase
 - The PoolCreationSubsidy contract manages subsidies for liquidity pool creation
-- The BAG Token has a fixed supply of 1,000,000,000 tokens with 18 decimals, all initially minted to the owner address 
+- The BAG Token has a fixed supply of 1,000,000,000 tokens with 18 decimals, all initially minted to the owner address
+
+## Fees and Costs
+### Required BAG Token Fees
+- Agent Creation Fee: 100 BAG (paid by Agent creator to Protocol Treasury)
+- Graduation Fee: 525 BAG (taken from the 42,000 BAG collected in the bonding curve)
+
+### Subsidized Costs
+- All pool creation costs are covered by the PoolCreationSubsidy contract
+- Agent creators do not need to pay any ETH for deployment or pool creation
+- The protocol automatically handles all gas costs for pool creation during graduation 

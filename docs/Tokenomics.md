@@ -32,6 +32,8 @@ For detailed information about the Genesis Agent and AI3 Agent, please refer to 
   - Transaction fees and graduation fees
   - Initial liquidity provision
 
+Note: Pool creation costs are covered by the protocol's PoolCreationSubsidy contract, ensuring Agent creators only need to pay the BAG token fees.
+
 #### Bonding Curve Mechanism
 - Smart contract automatically prices tokens based on supply and demand
 - Uses formula `y = A*e^(Bx)` for predictable price discovery

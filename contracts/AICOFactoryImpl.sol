@@ -185,7 +185,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
 
         token = address(Clones.cloneDeterministic(tokenImplementation, tokenSalt));
         
-        AICO(payable(token)).initialize{value: msg.value}(
+        AICO(payable(token)).initialize(
             _agentCreator,
             _platformReferrer,
             bondingCurve,

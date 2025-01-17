@@ -115,7 +115,7 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         address _weth,
         address _poolCreationSubsidy,
         address _uniswapV2Factory
-    ) public payable initializer {
+    ) public initializer {
         if (_tokenCreator == address(0)) revert AddressZero();
         if (_platformReferrer == address(0)) revert AddressZero();
         if (_bondingCurve == address(0)) revert AddressZero();

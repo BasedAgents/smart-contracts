@@ -141,7 +141,8 @@
 - The protocol maintains a PoolCreationSubsidy contract with ETH balance
 - This contract pays for the gas costs of creating new Uniswap V2 pools
 - Only authorized AICO tokens can request pool creation through this contract
-- The subsidy removes the burden of pool creation costs from both Agent creators and buyers
+- The subsidy removes the need for Agent creators to pay any ETH, as all pool creation costs are covered by the protocol
+- This ensures Agent creators only need to pay the required BAG token fees
 
 ### Graduation Process
 1. All 500M tokens from primary market supply are sold

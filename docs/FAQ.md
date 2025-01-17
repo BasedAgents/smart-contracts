@@ -35,8 +35,9 @@ Based Agents is deployed on Base, chosen for its high performance, low costs, an
 ### What are the costs involved in launching an Agent?
 Please refer to our [Tokenomics documentation](./Tokenomics.md) for detailed fee structures. In summary:
 - Agent Creation Fee: 100 BAG
-- Gas costs for deployment (subsidized for pool creation)
 - Graduation Fee: 525 BAG (paid when transitioning to Uniswap)
+
+Note: Pool creation costs are covered by the protocol's PoolCreationSubsidy contract.
 
 ### Can I modify my Agent after launch?
 By default, the Agent creator (designated as the Director) maintains control over the Agent's code, parameters, and strategy. This allows for agile development and quick responses to opportunities or challenges. However, token holders have the power to:
