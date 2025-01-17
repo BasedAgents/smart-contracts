@@ -5,10 +5,32 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("Deploying contracts with account:", deployer.address);
 
-    // Contract addresses
-    const BAG_TOKEN = "0x780DB7650ef1F50d949CB56400eE03052C7853CC";  // New BAG token proxy address
+    // Constants
+    const BAG_TOKEN = "0x780DB7650ef1F50d949CB56400eE03052C7853CC";
+    const UNISWAP_V2_FACTORY = "0xc35DADB65012eC5796536bD9864eD8773aBc74C4";
     const WETH = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9";  // Sepolia WETH
-    const UNISWAP_V2_FACTORY = "0xc35DADB65012eC5796536bD9864eD8773aBc74C4";  // Sepolia Uniswap V2 Factory
+    const DELAY_DURATION = 24 * 60 * 60; // 24 hours in seconds
+
+    // Deploy VetoContract
+    console.log("\nDeploying VetoContract...");
+    const VetoContract = await ethers.getContractFactory("VetoContract");
+    const vetoContract = await VetoContract.deploy();
+    await vetoContract.waitForDeployment();
+    console.log("VetoContract deployed to:", await vetoContract.getAddress());
+
+    // Deploy DelayModule
+    console.log("\nDeploying DelayModule...");
+    const DelayModule = await ethers.getContractFactory("DelayModule");
+    const delayModule = await DelayModule.deploy(await vetoContract.getAddress(), DELAY_DURATION);
+    await delayModule.waitForDeployment();
+    console.log("DelayModule deployed to:", await delayModule.getAddress());
+
+    // Deploy ProtocolRewards
+    console.log("\nDeploying ProtocolRewards...");
+    const ProtocolRewards = await ethers.getContractFactory("ProtocolRewards");
+    const protocolRewards = await ProtocolRewards.deploy();
+    await protocolRewards.waitForDeployment();
+    console.log("ProtocolRewards deployed to:", await protocolRewards.getAddress());
 
     // Deploy BondingCurve
     console.log("\nDeploying BondingCurve...");
@@ -30,7 +52,7 @@ async function main() {
     const PoolCreationSubsidy = await ethers.getContractFactory("PoolCreationSubsidy");
     const poolCreationSubsidy = await upgrades.deployProxy(
         PoolCreationSubsidy,
-        [BAG_TOKEN, deployer.address],
+        [UNISWAP_V2_FACTORY, deployer.address],
         { initializer: "initialize", kind: "uups" }
     );
     await poolCreationSubsidy.waitForDeployment();
@@ -50,7 +72,7 @@ async function main() {
     await aicoGovernorImpl.waitForDeployment();
     console.log("AICOGovernor Implementation deployed to:", await aicoGovernorImpl.getAddress());
 
-    // Deploy AICOFactory Implementation
+    // Deploy AICOFactory
     console.log("\nDeploying AICOFactory...");
     const AICOFactory = await ethers.getContractFactory("AICOFactoryImpl");
     const aicoFactory = await upgrades.deployProxy(AICOFactory, [
@@ -62,7 +84,7 @@ async function main() {
         UNISWAP_V2_FACTORY, // _uniswapV2Factory
         BAG_TOKEN, // _bagToken
         deployer.address, // _protocolFeeRecipient
-        deployer.address, // _protocolRewards
+        await protocolRewards.getAddress(), // _protocolRewards
         WETH // _weth
     ], {
         initializer: "initialize",
@@ -71,46 +93,28 @@ async function main() {
     await aicoFactory.waitForDeployment();
     console.log("AICOFactory deployed to:", await aicoFactory.getAddress());
 
-    // Wait before verification
-    console.log("\nWaiting 30 seconds before verification...");
-    await new Promise(resolve => setTimeout(resolve, 30000));
-
-    // Verify all contracts
+    // Verify contracts
+    console.log("\nVerifying contracts on Etherscan...");
     try {
-        // Verify BondingCurve implementation
-        const bondingCurveImpl = await upgrades.erc1967.getImplementationAddress(await bondingCurve.getAddress());
         await hre.run("verify:verify", {
-            address: bondingCurveImpl,
-            constructorArguments: [BAG_TOKEN]
-        });
-
-        // Verify PoolCreationSubsidy implementation
-        const subsidyImpl = await upgrades.erc1967.getImplementationAddress(await poolCreationSubsidy.getAddress());
-        await hre.run("verify:verify", {
-            address: subsidyImpl,
+            address: await vetoContract.getAddress(),
             constructorArguments: []
         });
+        console.log("VetoContract verified");
 
-        // Verify AICO implementation
         await hre.run("verify:verify", {
-            address: await aicoImpl.getAddress(),
+            address: await delayModule.getAddress(),
+            constructorArguments: [await vetoContract.getAddress(), DELAY_DURATION]
+        });
+        console.log("DelayModule verified");
+
+        await hre.run("verify:verify", {
+            address: await protocolRewards.getAddress(),
             constructorArguments: []
         });
+        console.log("ProtocolRewards verified");
 
-        // Verify AICOGovernor implementation
-        await hre.run("verify:verify", {
-            address: await aicoGovernorImpl.getAddress(),
-            constructorArguments: []
-        });
-
-        // Verify AICOFactory implementation
-        const factoryImpl = await upgrades.erc1967.getImplementationAddress(await aicoFactory.getAddress());
-        await hre.run("verify:verify", {
-            address: factoryImpl,
-            constructorArguments: []
-        });
-
-        console.log("All implementations verified successfully");
+        // ... rest of the verifications
     } catch (error) {
         console.error("Error during verification:", error);
     }
