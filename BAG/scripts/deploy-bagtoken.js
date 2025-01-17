@@ -24,6 +24,18 @@ async function main() {
     const implAddress = await upgrades.erc1967.getImplementationAddress(bagTokenAddress);
     console.log("BAG Token implementation deployed to:", implAddress);
 
+    // Verify owner and total supply
+    const owner = await bagToken.owner();
+    const totalSupply = await bagToken.totalSupply();
+    console.log("\nContract State:");
+    console.log("Owner:", owner);
+    console.log("Total Supply:", ethers.formatUnits(totalSupply, 18), "BAG");
+    
+    if (owner === ethers.ZeroAddress) {
+        console.error("ERROR: Owner is set to zero address!");
+        return;
+    }
+
     // Wait a few blocks before verification
     console.log("\nWaiting 30 seconds before verification...");
     await new Promise(resolve => setTimeout(resolve, 30000));
