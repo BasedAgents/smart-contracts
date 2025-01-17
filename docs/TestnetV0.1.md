@@ -2,6 +2,22 @@
 
 This document contains the addresses of all smart contracts deployed to the Sepolia testnet for version 0.1.
 
+## Understanding Proxy vs Implementation Contracts
+
+Our system uses two types of contract deployments:
+
+1. **Proxy + Implementation Pattern**:
+   - Used for contracts that need to be upgradeable and maintain state
+   - The Proxy is the address users interact with
+   - The Implementation contains the logic but can be upgraded
+   - Used by: BondingCurve, PoolCreationSubsidy, AICOFactory, and BAG Token
+
+2. **Implementation-Only Pattern**:
+   - Used for contracts that are deployed as templates
+   - These implementations are cloned (using minimal proxies) when new Agents are created
+   - No proxy needed as they serve as blueprints for future deployments
+   - Used by: AICO Token and AICOGovernor
+
 ## Core Contracts
 
 ### BondingCurve
@@ -14,9 +30,11 @@ This document contains the addresses of all smart contracts deployed to the Sepo
 
 ### AICO Token
 - Implementation: `0xa9F491f7f446829dEE9127B79Ed2EADAA3742A60`
+(Template contract - new instances are cloned for each Agent)
 
 ### AICOGovernor
 - Implementation: `0x134A6fE08a524B346569585d36E3Fc206BE1399C`
+(Template contract - new instances are cloned for each Agent)
 
 ### AICOFactory
 - Proxy: `0xe818983aAC79AFb69C39b7ec19d1EC67b90452Ff`
@@ -45,7 +63,7 @@ The following contracts have been verified on Sepolia Etherscan:
 
 ## Notes
 - All implementation contracts are designed to be upgradeable using the UUPS proxy pattern
-- The AICOFactory contract can be used to deploy new AICO tokens and their associated governors
+- The AICOFactory contract uses the AICO Token and AICOGovernor implementations as templates to clone new instances for each Agent
 - The BondingCurve contract handles the initial token distribution phase
 - The PoolCreationSubsidy contract manages subsidies for liquidity pool creation
 - The BAG Token has a fixed supply of 1,000,000,000 tokens with 18 decimals, all initially minted to the owner address 
