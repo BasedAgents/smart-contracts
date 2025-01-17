@@ -1,3 +1,68 @@
+# Testing Plan
+
+## Initial Tests (Critical Path)
+
+These are the 10 most critical test cases that validate the core functionality of the system:
+
+1. **Agent Token Creation and Initial Supply Distribution**
+   - Verify that a new Agent token can be created
+   - Confirm initial supply distribution:
+     - 300M tokens to Agent's wallet
+     - 500M tokens to bonding curve
+     - 200M tokens reserved for Uniswap pool
+   - Test that total supply is 1B tokens
+
+2. **Bonding Curve Purchase**
+   - Test that Agent creator can buy tokens from bonding curve
+   - Test that third parties can buy tokens from bonding curve
+   - Verify correct token amounts received based on BAG spent
+   - Confirm fees are correctly distributed
+
+3. **Bonding Curve Sale**
+   - Test that holders can sell tokens back to bonding curve
+   - Verify correct BAG amount received based on tokens sold
+   - Confirm fees are correctly distributed
+
+4. **Market Graduation**
+   - Test automatic graduation trigger at 42,000 BAG collected
+   - Verify bonding curve trading is disabled
+   - Confirm 200M tokens + 42,000 BAG (minus fees) are moved to Uniswap
+   - Test that trading continues on Uniswap after graduation
+
+5. **Pool Creation Subsidy**
+   - Test subsidy calculation and distribution
+   - Verify gas cost reduction for pool creation
+   - Confirm subsidy limits and restrictions
+
+6. **Governor Fund Management**
+   - Test that Governor contract can receive funds
+   - Test that Governor can spend funds through proposals
+   - Verify fund management restrictions
+
+7. **Token Delegation**
+   - Test delegation of voting power
+   - Verify delegation updates voting power correctly
+   - Test delegation to multiple addresses
+
+8. **Proposal Voting**
+   - Test proposal creation
+   - Test voting by token holders/delegates
+   - Verify vote counting and thresholds
+   - Test proposal execution
+
+9. **Proposal Veto**
+   - Test veto voting process
+   - Verify veto thresholds
+   - Test veto impact on proposals
+   - Confirm veto timelock functionality
+
+10. **Governor Ownership Transfer**
+    - Test ownership transfer process
+    - Verify new owner permissions
+    - Test restrictions on ownership transfer
+
+Each test should be executed on both local testnet and Sepolia before mainnet deployment.
+
 # Based Agents Testing Plan
 
 ## Overview
