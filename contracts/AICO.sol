@@ -330,4 +330,215 @@ contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgrad
         // Initialize the pair
         IUniswapV2Pair(pair).mint(address(this));
     }
+
+    /// @notice Buy tokens with BAG
+    /// @param _recipient Address to receive the tokens
+    /// @param _orderReferrer Address of the order referrer
+    /// @param _comment Optional comment for the transaction
+    /// @param _minTokensOut Minimum tokens to receive (slippage protection)
+    /// @param _deadline Transaction deadline timestamp
+    function buy(
+        address _recipient,
+        address _orderReferrer,
+        string memory _comment,
+        uint256 _bagAmount,
+        uint256 _minTokensOut,
+        uint256 _deadline
+    ) external nonReentrant returns (uint256 tokensBought) {
+        if (_recipient == address(0)) revert AddressZero();
+        if (_bagAmount < MIN_ORDER_SIZE) revert OrderTooSmall();
+        if (block.timestamp > _deadline) revert DeadlineExpired();
+
+        // Calculate fee
+        uint256 fee = (_bagAmount * TOTAL_FEE_BPS) / 10_000;
+        uint256 bagAfterFee = _bagAmount - fee;
+
+        if (marketType == MarketType.BONDING_CURVE) {
+            // Get current supply excluding Agent allocation
+            uint256 currentSupply = totalSupply() - AGENT_ALLOCATION;
+            if (currentSupply >= PRIMARY_MARKET_SUPPLY) revert MaxSupplyReached();
+
+            // Calculate tokens to mint using bonding curve
+            tokensBought = bondingCurve.getBAGBuyQuote(currentSupply, bagAfterFee);
+            if (tokensBought < _minTokensOut) revert SlippageExceeded();
+
+            // Transfer BAG tokens from buyer
+            require(BAG.transferFrom(msg.sender, address(this), _bagAmount), "BAG transfer failed");
+
+            // Mint tokens to recipient
+            _mint(_recipient, tokensBought);
+
+            // Handle fees
+            _disperseFees(fee, _orderReferrer);
+
+            // Check if we need to graduate to Uniswap
+            if (totalSupply() - AGENT_ALLOCATION >= PRIMARY_MARKET_SUPPLY) {
+                _graduateToUniswap();
+            }
+        } else {
+            // Market has graduated to Uniswap
+            require(poolAddress != address(0), "Pool not initialized");
+            
+            // Transfer BAG tokens from buyer
+            require(BAG.transferFrom(msg.sender, address(this), _bagAmount), "BAG transfer failed");
+
+            // Approve Uniswap router
+            BAG.approve(address(swapRouter), bagAfterFee);
+
+            // Swap on Uniswap
+            ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+                tokenIn: address(BAG),
+                tokenOut: address(this),
+                fee: LP_FEE,
+                recipient: _recipient,
+                deadline: _deadline,
+                amountIn: bagAfterFee,
+                amountOutMinimum: _minTokensOut,
+                sqrtPriceLimitX96: 0
+            });
+
+            tokensBought = ISwapRouter(swapRouter).exactInputSingle(params);
+
+            // Handle fees
+            _disperseFees(fee, _orderReferrer);
+        }
+
+        emit AICOTokenBuy(
+            msg.sender,
+            _recipient,
+            _orderReferrer,
+            _bagAmount,
+            fee,
+            bagAfterFee,
+            tokensBought,
+            balanceOf(_recipient),
+            _comment,
+            totalSupply(),
+            marketType
+        );
+    }
+
+    /// @notice Sell tokens for BAG
+    /// @param _recipient Address to receive the BAG tokens
+    /// @param _orderReferrer Address of the order referrer
+    /// @param _comment Optional comment for the transaction
+    /// @param _tokensToSell Amount of tokens to sell
+    /// @param _minBagOut Minimum BAG to receive (slippage protection)
+    /// @param _deadline Transaction deadline timestamp
+    function sell(
+        address _recipient,
+        address _orderReferrer,
+        string memory _comment,
+        uint256 _tokensToSell,
+        uint256 _minBagOut,
+        uint256 _deadline
+    ) external nonReentrant returns (uint256 bagReceived) {
+        if (_recipient == address(0)) revert AddressZero();
+        if (_tokensToSell < MIN_ORDER_SIZE) revert OrderTooSmall();
+        if (block.timestamp > _deadline) revert DeadlineExpired();
+
+        if (marketType == MarketType.BONDING_CURVE) {
+            // Get current supply excluding Agent allocation
+            uint256 currentSupply = totalSupply() - AGENT_ALLOCATION;
+
+            // Calculate BAG to receive using bonding curve
+            bagReceived = bondingCurve.getTokenSellQuote(currentSupply, _tokensToSell);
+            if (bagReceived < _minBagOut) revert SlippageExceeded();
+
+            // Calculate fee
+            uint256 fee = (bagReceived * TOTAL_FEE_BPS) / 10_000;
+            uint256 bagAfterFee = bagReceived - fee;
+
+            // Burn tokens from seller
+            _burn(msg.sender, _tokensToSell);
+
+            // Transfer BAG to recipient
+            require(BAG.transfer(_recipient, bagAfterFee), "BAG transfer failed");
+
+            // Handle fees
+            _disperseFees(fee, _orderReferrer);
+        } else {
+            // Market has graduated to Uniswap
+            require(poolAddress != address(0), "Pool not initialized");
+
+            // Transfer tokens from seller
+            _transfer(msg.sender, address(this), _tokensToSell);
+
+            // Approve Uniswap router
+            _approve(address(this), address(swapRouter), _tokensToSell);
+
+            // Swap on Uniswap
+            ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+                tokenIn: address(this),
+                tokenOut: address(BAG),
+                fee: LP_FEE,
+                recipient: address(this),
+                deadline: _deadline,
+                amountIn: _tokensToSell,
+                amountOutMinimum: _minBagOut,
+                sqrtPriceLimitX96: 0
+            });
+
+            bagReceived = ISwapRouter(swapRouter).exactInputSingle(params);
+
+            // Calculate fee
+            uint256 fee = (bagReceived * TOTAL_FEE_BPS) / 10_000;
+            uint256 bagAfterFee = bagReceived - fee;
+
+            // Transfer BAG to recipient
+            require(BAG.transfer(_recipient, bagAfterFee), "BAG transfer failed");
+
+            // Handle fees
+            _disperseFees(fee, _orderReferrer);
+        }
+
+        emit AICOTokenSell(
+            msg.sender,
+            _recipient,
+            _orderReferrer,
+            bagReceived,
+            bagReceived - bagAfterFee,
+            bagAfterFee,
+            _tokensToSell,
+            balanceOf(msg.sender),
+            _comment,
+            totalSupply(),
+            marketType
+        );
+    }
+
+    /// @dev Internal function to handle graduation to Uniswap
+    function _graduateToUniswap() internal {
+        // Collect graduation fee
+        require(BAG.transferFrom(msg.sender, address(this), graduationFee), "Graduation fee transfer failed");
+        _disperseFees(graduationFee, address(0));
+
+        // Create Uniswap V2 pool
+        poolAddress = IUniswapV2Factory(uniswapV2Factory).createPair(address(this), address(BAG));
+
+        // Mint secondary market supply
+        _mint(address(this), SECONDARY_MARKET_SUPPLY);
+
+        // Approve tokens for pool
+        _approve(address(this), poolAddress, SECONDARY_MARKET_SUPPLY);
+        BAG.approve(poolAddress, type(uint256).max);
+
+        // Add initial liquidity
+        (uint256 ethLiquidity, uint256 tokenLiquidity, uint256 lpTokens) = PoolCreationSubsidy(poolCreationSubsidy).createPool(
+            address(this),
+            SECONDARY_MARKET_SUPPLY
+        );
+
+        // Update market type
+        marketType = MarketType.UNISWAP_POOL;
+
+        emit AICOMarketGraduated(
+            address(this),
+            poolAddress,
+            ethLiquidity,
+            tokenLiquidity,
+            lpTokens,
+            marketType
+        );
+    }
 } 
