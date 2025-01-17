@@ -5,14 +5,15 @@ async function main() {
     console.log("Deploying BAG Token with account:", deployer.address);
 
     // Deploy BAG Token
-    const BagToken = await ethers.getContractFactory("BagToken");
+    const BAGToken = await ethers.getContractFactory("BAGToken");
     console.log("Deploying BAG Token...");
     
     const token = await upgrades.deployProxy(
-        BagToken,
+        BAGToken,
         [
-            deployer.address,  // initial owner
-            ethers.parseEther("1000000000")  // initial supply: 1 billion tokens
+            "BAG Token",     // _name
+            "BAG",          // _symbol
+            deployer.address // _owner
         ],
         {
             initializer: "initialize",
@@ -33,7 +34,7 @@ async function main() {
     console.log("Owner:", await token.owner());
 
     console.log("\nVerification command:");
-    console.log(`npx hardhat verify --network base ${await upgrades.erc1967.getImplementationAddress(tokenAddress)}`);
+    console.log(`npx hardhat verify --network sepolia ${await upgrades.erc1967.getImplementationAddress(tokenAddress)}`);
 }
 
 main()

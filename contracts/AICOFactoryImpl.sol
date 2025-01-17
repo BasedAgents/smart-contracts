@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
-import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
-import {IAICOFactory} from "./interfaces/IAICOFactory.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {AICO} from "./AICO.sol";
 import {AICOGovernor} from "./AICOGovernor.sol";
+import {BondingCurve} from "./BondingCurve.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {IAICOFactory} from "./interfaces/IAICOFactory.sol";
+import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 /* 
     !!!         !!!         !!!    
@@ -24,30 +26,132 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
     AICO        AICO        AICO    
 */
 contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
-    address public immutable tokenImplementation;
-    address public immutable bondingCurve;
-    address public immutable governorImplementation;
-    address public immutable poolCreationSubsidy;
-    address public immutable uniswapV2Factory;
-    uint256 public agentCreationFee = 100e18; // 100 BAG, upgradable
-    IERC20 public immutable BAG;
+    address public tokenImplementation;
+    address public bondingCurve;
+    address public governorImplementation;
+    address public poolCreationSubsidy;
+    address public uniswapV2Factory;
+    address public protocolFeeRecipient;
+    address public protocolRewards;
+    address public WETH;
+    uint256 public agentCreationFee;
+    IERC20 public BAG;
 
     event AgentCreationFeeUpdated(uint256 oldFee, uint256 newFee);
+    event ContractAddressesUpdated(
+        address tokenImplementation,
+        address governorImplementation,
+        address bondingCurve,
+        address poolCreationSubsidy,
+        address uniswapV2Factory,
+        address bagToken,
+        address protocolFeeRecipient,
+        address protocolRewards,
+        address weth
+    );
 
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
+        address _owner,
         address _tokenImplementation, 
         address _governorImplementation, 
         address _bondingCurve,
         address _poolCreationSubsidy,
         address _uniswapV2Factory,
-        address _bagToken
-    ) initializer {
+        address _bagToken,
+        address _protocolFeeRecipient,
+        address _protocolRewards,
+        address _weth
+    ) external initializer {
+        __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
+        __Ownable_init(_owner);
+
+        agentCreationFee = 100e18; // 100 BAG
+
+        _updateContractAddresses(
+            _tokenImplementation,
+            _governorImplementation,
+            _bondingCurve,
+            _poolCreationSubsidy,
+            _uniswapV2Factory,
+            _bagToken,
+            _protocolFeeRecipient,
+            _protocolRewards,
+            _weth
+        );
+    }
+
+    function updateContractAddresses(
+        address _tokenImplementation,
+        address _governorImplementation,
+        address _bondingCurve,
+        address _poolCreationSubsidy,
+        address _uniswapV2Factory,
+        address _bagToken,
+        address _protocolFeeRecipient,
+        address _protocolRewards,
+        address _weth
+    ) external onlyOwner {
+        _updateContractAddresses(
+            _tokenImplementation,
+            _governorImplementation,
+            _bondingCurve,
+            _poolCreationSubsidy,
+            _uniswapV2Factory,
+            _bagToken,
+            _protocolFeeRecipient,
+            _protocolRewards,
+            _weth
+        );
+    }
+
+    function _updateContractAddresses(
+        address _tokenImplementation,
+        address _governorImplementation,
+        address _bondingCurve,
+        address _poolCreationSubsidy,
+        address _uniswapV2Factory,
+        address _bagToken,
+        address _protocolFeeRecipient,
+        address _protocolRewards,
+        address _weth
+    ) internal {
+        require(_tokenImplementation != address(0), "Zero address not allowed");
+        require(_governorImplementation != address(0), "Zero address not allowed");
+        require(_bondingCurve != address(0), "Zero address not allowed");
+        require(_poolCreationSubsidy != address(0), "Zero address not allowed");
+        require(_uniswapV2Factory != address(0), "Zero address not allowed");
+        require(_bagToken != address(0), "Zero address not allowed");
+        require(_protocolFeeRecipient != address(0), "Zero address not allowed");
+        require(_protocolRewards != address(0), "Zero address not allowed");
+        require(_weth != address(0), "Zero address not allowed");
+
         tokenImplementation = _tokenImplementation;
         governorImplementation = _governorImplementation;
         bondingCurve = _bondingCurve;
         poolCreationSubsidy = _poolCreationSubsidy;
         uniswapV2Factory = _uniswapV2Factory;
         BAG = IERC20(_bagToken);
+        protocolFeeRecipient = _protocolFeeRecipient;
+        protocolRewards = _protocolRewards;
+        WETH = _weth;
+
+        emit ContractAddressesUpdated(
+            _tokenImplementation,
+            _governorImplementation,
+            _bondingCurve,
+            _poolCreationSubsidy,
+            _uniswapV2Factory,
+            _bagToken,
+            _protocolFeeRecipient,
+            _protocolRewards,
+            _weth
+        );
     }
 
     function updateAgentCreationFee(uint256 _newFee) external onlyOwner {
@@ -75,7 +179,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
         uint256 _proposalThreshold
     ) external payable nonReentrant returns (address token, address governor) {
         // Collect creation fee
-        require(BAG.transferFrom(msg.sender, AICO(payable(token)).protocolFeeRecipient(), agentCreationFee), "Creation fee transfer failed");
+        require(BAG.transferFrom(msg.sender, protocolFeeRecipient, agentCreationFee), "Creation fee transfer failed");
 
         bytes32 tokenSalt = _generateSalt(_agentCreator, _tokenURI);
 
@@ -88,14 +192,19 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
             _agentWallet,
             _tokenURI,
             _name,
-            _symbol
+            _symbol,
+            protocolFeeRecipient,
+            protocolRewards,
+            WETH,
+            poolCreationSubsidy,
+            uniswapV2Factory
         );
 
         bytes32 governorSalt = keccak256(abi.encodePacked(tokenSalt, "governor"));
         governor = address(Clones.cloneDeterministic(governorImplementation, governorSalt));
         
         AICOGovernor(payable(governor)).initialize(
-            IVotesUpgradeable(token),
+            IVotes(token),
             _agentCreator,
             _votingDelay,
             _votingPeriod,
@@ -106,7 +215,7 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
             address(this),
             _agentCreator,
             _platformReferrer,
-            AICO(payable(token)).protocolFeeRecipient(),
+            protocolFeeRecipient,
             bondingCurve,
             _tokenURI,
             _name,
@@ -142,15 +251,6 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
                 tx.origin
             )
         );
-    }
-
-    /// @notice Initializes the factory proxy contract
-    /// @param _owner Address of the contract owner
-    /// @dev Can only be called once due to initializer modifier
-    function initialize(address _owner) external initializer {
-        __UUPSUpgradeable_init();
-        __ReentrancyGuard_init();
-        __Ownable_init(_owner);
     }
 
     /// @notice The implementation address of the factory contract

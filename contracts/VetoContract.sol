@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.20;
 
 import "./interfaces/IVetoContract.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";

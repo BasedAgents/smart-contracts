@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.20;
 
 import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /* 
@@ -15,12 +16,13 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
     AICO        AICO        AICO    
 */
-contract BondingCurve is OwnableUpgradeable {
+contract BondingCurve is OwnableUpgradeable, UUPSUpgradeable {
     using FixedPointMathLib for uint256;
     using FixedPointMathLib for int256;
 
     error InsufficientLiquidity();
 
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     IERC20 public immutable BAG;
     
     // y = A*e^(Bx)
@@ -34,10 +36,19 @@ contract BondingCurve is OwnableUpgradeable {
     uint256 public A;
     uint256 public B;
 
-    constructor(address _bagToken, address _tokenCreator) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor(address _bagToken) {
+        if (_bagToken == address(0)) revert("Zero address");
         BAG = IERC20(_bagToken);
-         __Ownable_init(_tokenCreator);
+        _disableInitializers();
     }
+
+    function initialize(address _tokenCreator) external initializer {
+        __Ownable_init(_tokenCreator);
+        __UUPSUpgradeable_init();
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function getBAGSellQuote(uint256 currentSupply, uint256 bagOrderSize) external view returns (uint256) {
         uint256 deltaY = bagOrderSize;

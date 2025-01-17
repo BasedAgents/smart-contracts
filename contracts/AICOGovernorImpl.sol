@@ -63,7 +63,7 @@ contract AICOGovernorImpl is
     /// @param _votingPeriod Duration of voting
     /// @param _proposalThreshold Minimum tokens required to create a proposal
     function initialize(
-        IVotesUpgradeable _token, 
+        IVotes _token, 
         address _tokenCreator,
         uint48 _votingDelay,
         uint32 _votingPeriod,

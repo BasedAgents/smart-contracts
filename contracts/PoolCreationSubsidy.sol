@@ -3,9 +3,10 @@ pragma solidity ^0.8.23;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IUniswapV2Factory} from "./interfaces/IUniswapV2Factory.sol";
 
-contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable {
+contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable, UUPSUpgradeable {
     address public uniswapV2Factory;
     mapping(address => bool) public authorizedCallers;
 
@@ -18,6 +19,7 @@ contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
@@ -25,8 +27,11 @@ contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function initialize(address _uniswapV2Factory, address _owner) external initializer {
         __Ownable_init(_owner);
         __ReentrancyGuard_init();
+        __UUPSUpgradeable_init();
         uniswapV2Factory = _uniswapV2Factory;
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function createPool(address token, address weth) external onlyAuthorized nonReentrant returns (address pair) {
         // Sort token addresses (required by Uniswap V2)
