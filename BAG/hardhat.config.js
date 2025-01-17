@@ -1,6 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
-require('dotenv').config();
+const secret = require('../secret.js');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -28,18 +28,18 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://rpc.sepolia.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      url: secret.url,
+      accounts: [secret.key],
       chainId: 11155111
     },
     baseSepolia: {
-      url: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      url: "https://sepolia.base.org",
+      accounts: [secret.key],
       chainId: 84532
     },
     base: {
-      url: process.env.BASE_RPC_URL || "https://mainnet.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      url: "https://mainnet.base.org",
+      accounts: [secret.key],
       chainId: 8453,
       verify: {
         etherscan: {
@@ -50,9 +50,9 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY,
-      baseSepolia: process.env.BASESCAN_API_KEY,
-      base: process.env.BASESCAN_API_KEY
+      sepolia: secret.etherscan,
+      baseSepolia: secret.basescan,
+      base: secret.basescan
     },
     customChains: [
       {
