@@ -39,7 +39,7 @@ error SlippageExceeded();
 error MarketAlreadyGraduated();
 
 contract AICO is IAICO, Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, ERC20VotesUpgradeable, UUPSUpgradeable {
-    IERC20 public constant BAG = IERC20(0xCafEb3Dd19F644F06023C9064F8fd1f87Ac95e0A);
+    IERC20 public constant BAG = IERC20(0x780DB7650ef1F50d949CB56400eE03052C7853CC);
 
     uint256 public MAX_TOTAL_SUPPLY;
     uint256 public PRIMARY_MARKET_SUPPLY;
