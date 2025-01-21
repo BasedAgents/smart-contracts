@@ -16,6 +16,30 @@
    - Click "Verify" to verify the proxy implementation
    - Confirm implementation contract is linked correctly
 
+## Contract Verification Notes
+
+### Special Case: Governor Proxy Verification
+The Governor proxy contract at `0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a` required special handling for verification. This was because:
+
+1. The initial verification attempt failed as the proxy contract needed explicit contract type specification
+2. The proxy was created by the AICOFactory during AICO creation, making it different from other proxies deployed directly
+
+The solution was to create a dedicated verification script ([scripts/verify-governor.js](../scripts/verify-governor.js)) that:
+- Verifies the Governor Logic implementation
+- Explicitly specifies the ERC1967 proxy contract type
+- Provides the correct constructor arguments for the proxy
+
+This script resolved the verification issue that wasn't caught by the main verification script because:
+- The main script assumes standard proxy deployment patterns
+- Factory-created proxies need explicit contract type specification
+- The proxy's constructor arguments needed to be correctly specified
+
+### Verification Status
+| Contract | Address | Status | Notes |
+|----------|----------|---------|--------|
+| Governor Logic | `0x3c21c9bC638030AC0ea30ba76d00184d4940b265` | ✅ Verified | Implementation contract |
+| Governor Proxy | `0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a` | ✅ Verified | Required special verification |
+
 ## Core Contracts
 
 | Contract | Address | Verification Status |
@@ -48,47 +72,14 @@
 
 ## Manual Testing Checklist
 
-### 1. Initial Setup & Permissions
-Use these contracts:
-- BondingCurve Proxy: [0xf85dDb30e8cDEE17dA5dD9526eE7951F50fe914F](https://sepolia.etherscan.io/address/0xf85dDb30e8cDEE17dA5dD9526eE7951F50fe914F#writeContract)
-- AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#readContract)
-- Governor: [0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a](https://sepolia.etherscan.io/address/0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a#readContract)
-
-- [ ] Verify BondingCurve ownership is transferred to AICO (Check `owner()` on BondingCurve Proxy)
-- [ ] Verify AICO has correct router set (Call `uniswapV2Router()` on AICO Runtime)
-- [ ] Verify Governor has correct voting delay/period (Call `votingDelay()` and `votingPeriod()` on Governor)
-
-### 2. Bonding Curve Operations
-Use these contracts:
-- AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#writeContract)
-- BAG Token: [0x780DB7650ef1F50d949CB56400eE03052C7853CC](https://sepolia.etherscan.io/address/0x780DB7650ef1F50d949CB56400eE03052C7853CC#writeContract)
-- ProtocolRewards: [0xD0AD1FDA6Bda09ea5cff81ccAaf56eB5E60cdb4c](https://sepolia.etherscan.io/address/0xD0AD1FDA6Bda09ea5cff81ccAaf56eB5E60cdb4c#readContract)
-
-- [ ] Test small buy (1-5 BAG) through AICO Runtime
-- [ ] Verify correct token minting ratio (~11.9M tokens per 1k BAG)
-- [ ] Test token selling through AICO Runtime
-- [ ] Verify fees are distributed to ProtocolRewards
-
-### 3. Governance Testing
-Use these contracts:
-- Governor: [0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a](https://sepolia.etherscan.io/address/0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a#writeContract)
-- AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#readContract)
-
-- [ ] Check Governor's token balance (should be 300M)
-- [ ] Create test proposal for a small transfer
-- [ ] Vote on proposal
-- [ ] Execute proposal after voting period
-- [ ] Verify proposal execution succeeded
-
-### 4. Factory Verification
+### 1. Factory Verification & Initial Setup
 Use this contract:
 - AICOFactory Proxy: [0xe3a9C604E31197FB817077e01dB01a384B27BD5A](https://sepolia.etherscan.io/address/0xe3a9C604E31197FB817077e01dB01a384B27BD5A#writeContract)
 
 - [ ] Verify factory points to correct AICO/Governor implementations
 - [ ] Verify factory owner permissions
-- [ ] Optional: Try creating another AICO instance
 
-### 5. Agent Token Deployment & Management
+### 2. Agent Token Deployment & Management
 Use these contracts:
 - AICOFactory Proxy: [0xe3a9C604E31197FB817077e01dB01a384B27BD5A](https://sepolia.etherscan.io/address/0xe3a9C604E31197FB817077e01dB01a384B27BD5A#writeContract)
 - AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#writeContract)
@@ -109,10 +100,45 @@ Tests:
 - [ ] Test platform referrer functionality
   - Verify referrer fees during buys
   - Test referrer fee distribution
-- [ ] Verify Agent token governance setup
-  - Check Governor association
-  - Test voting power delegation
-  - Verify proposal creation rights
+
+### 3. Post-Deployment Setup & Permissions
+Use these contracts:
+- BondingCurve Proxy: [0xf85dDb30e8cDEE17dA5dD9526eE7951F50fe914F](https://sepolia.etherscan.io/address/0xf85dDb30e8cDEE17dA5dD9526eE7951F50fe914F#writeContract)
+- AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#readContract)
+- Governor: [0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a](https://sepolia.etherscan.io/address/0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a#readContract)
+
+- [ ] Verify BondingCurve ownership is transferred to AICO (Check `owner()` on BondingCurve Proxy)
+- [ ] Verify AICO has correct router set (Call `uniswapV2Router()` on AICO Runtime)
+- [ ] Verify Governor has correct voting delay/period (Call `votingDelay()` and `votingPeriod()` on Governor)
+
+### 4. Bonding Curve Operations
+Use these contracts:
+- AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#writeContract)
+- BAG Token: [0x780DB7650ef1F50d949CB56400eE03052C7853CC](https://sepolia.etherscan.io/address/0x780DB7650ef1F50d949CB56400eE03052C7853CC#writeContract)
+- ProtocolRewards: [0xD0AD1FDA6Bda09ea5cff81ccAaf56eB5E60cdb4c](https://sepolia.etherscan.io/address/0xD0AD1FDA6Bda09ea5cff81ccAaf56eB5E60cdb4c#readContract)
+
+- [ ] Test small buy (1-5 BAG) through AICO Runtime
+- [ ] Verify correct token minting ratio (~11.9M tokens per 1k BAG)
+- [ ] Test token selling through AICO Runtime
+- [ ] Verify fees are distributed to ProtocolRewards
+
+### 5. Governance Testing
+Use these contracts:
+- Governor: [0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a](https://sepolia.etherscan.io/address/0xC2b28e195ecB9d3d568Cb94FE9c0A960791e728a#writeContract)
+- AICO Runtime: [0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1](https://sepolia.etherscan.io/address/0xBE93B86ca2f90D5408cF163151dfE0fD1fdcFBa1#readContract)
+
+**Voting Parameters**:
+- `votingDelay`: 1 block (~12 seconds) - Time between proposal creation and voting start
+- `votingPeriod`: 50 blocks (~10 minutes) - Duration of voting period
+
+These short periods are for testing purposes. On mainnet, these would typically be much longer (e.g., 1 day delay, 1 week voting period).
+
+Tests:
+- [ ] Check Governor's token balance (should be 300M)
+- [ ] Create test proposal for a small transfer
+- [ ] Vote on proposal
+- [ ] Execute proposal after voting period
+- [ ] Verify proposal execution succeeded
 
 ### 6. Market Graduation Testing
 Use these contracts:
