@@ -1,54 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
-import {AICO} from "./AICO.sol";
-import {AICOGovernor} from "./AICOGovernor.sol";
-import {BondingCurve} from "./BondingCurve.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {IAICOFactory} from "./interfaces/IAICOFactory.sol";
-import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import "./interfaces/IAICOGovernorImpl.sol";
+import "./interfaces/IAICO.sol";
 
-/* 
-    !!!         !!!         !!!    
-    !!!         !!!         !!!    
-    !!!         !!!         !!!    
-    !!!         !!!         !!!    
-    !!!         !!!         !!!    
-    !!!         !!!         !!!    
+/**
+ * @title AICOFactoryImpl
+ */
+contract AICOFactoryImpl is 
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
+    address public aicoLogic;
+    address public governorLogic;
 
-    AICO        AICO        AICO    
-*/
-contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
-    address public tokenImplementation;
-    address public bondingCurve;
-    address public governorImplementation;
-    address public poolCreationSubsidy;
-    address public uniswapV2Factory;
-    address public protocolFeeRecipient;
-    address public protocolRewards;
-    address public WETH;
-    uint256 public agentCreationFee;
-    IERC20 public BAG;
-
-    event AgentCreationFeeUpdated(uint256 oldFee, uint256 newFee);
-    event ContractAddressesUpdated(
-        address tokenImplementation,
-        address governorImplementation,
-        address bondingCurve,
-        address poolCreationSubsidy,
-        address uniswapV2Factory,
-        address bagToken,
-        address protocolFeeRecipient,
-        address protocolRewards,
-        address weth
-    );
+    event AICOCreated(address indexed aico, address indexed governor);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -56,209 +27,103 @@ contract AICOFactoryImpl is IAICOFactory, UUPSUpgradeable, ReentrancyGuardUpgrad
     }
 
     function initialize(
-        address _owner,
-        address _tokenImplementation, 
-        address _governorImplementation, 
-        address _bondingCurve,
-        address _poolCreationSubsidy,
-        address _uniswapV2Factory,
-        address _bagToken,
-        address _protocolFeeRecipient,
-        address _protocolRewards,
-        address _weth
+        address _aicoLogic,
+        address _governorLogic,
+        address _owner
     ) external initializer {
-        __UUPSUpgradeable_init();
-        __ReentrancyGuard_init();
         __Ownable_init(_owner);
+        __UUPSUpgradeable_init();
+        aicoLogic = _aicoLogic;
+        governorLogic = _governorLogic;
+    }
 
-        agentCreationFee = 100e18; // 100 BAG
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-        _updateContractAddresses(
-            _tokenImplementation,
-            _governorImplementation,
-            _bondingCurve,
-            _poolCreationSubsidy,
-            _uniswapV2Factory,
-            _bagToken,
-            _protocolFeeRecipient,
-            _protocolRewards,
-            _weth
+    function createAICOWithGovernor(
+        bytes memory aicoInitData,
+        address tokenCreator,
+        uint256 votingDelay,
+        uint256 votingPeriod,
+        uint256 proposalThreshold
+    ) external onlyOwner returns (address aicoAddress, address governorAddress) {
+        // Deploy Governor
+        ERC1967Proxy governorProxy = new ERC1967Proxy(governorLogic, "");
+        governorAddress = address(governorProxy);
+
+        // decode partial
+        bytes memory initNoSelector = new bytes(aicoInitData.length - 4);
+        for (uint i = 4; i < aicoInitData.length; i++) {
+            initNoSelector[i - 4] = aicoInitData[i];
+        }
+        (
+            address tokenCreator_,
+            address platformReferrer,
+            address bondingCurve,
+            address agentWallet,
+            address bagToken,
+            string memory tokenURI,
+            string memory name,
+            string memory symbol,
+            address poolSubsidy,
+            address uniswapFactory,
+            address protocolFeeRecipient,
+            address protocolRewards,
+            address owner_,
+            address governanceContract_
+        ) = abi.decode(
+            initNoSelector,
+            (address,address,address,address,address,string,string,string,address,address,address,address,address,address)
         );
-    }
 
-    function updateContractAddresses(
-        address _tokenImplementation,
-        address _governorImplementation,
-        address _bondingCurve,
-        address _poolCreationSubsidy,
-        address _uniswapV2Factory,
-        address _bagToken,
-        address _protocolFeeRecipient,
-        address _protocolRewards,
-        address _weth
-    ) external onlyOwner {
-        _updateContractAddresses(
-            _tokenImplementation,
-            _governorImplementation,
-            _bondingCurve,
-            _poolCreationSubsidy,
-            _uniswapV2Factory,
-            _bagToken,
-            _protocolFeeRecipient,
-            _protocolRewards,
-            _weth
-        );
-    }
-
-    function _updateContractAddresses(
-        address _tokenImplementation,
-        address _governorImplementation,
-        address _bondingCurve,
-        address _poolCreationSubsidy,
-        address _uniswapV2Factory,
-        address _bagToken,
-        address _protocolFeeRecipient,
-        address _protocolRewards,
-        address _weth
-    ) internal {
-        require(_tokenImplementation != address(0), "Zero address not allowed");
-        require(_governorImplementation != address(0), "Zero address not allowed");
-        require(_bondingCurve != address(0), "Zero address not allowed");
-        require(_poolCreationSubsidy != address(0), "Zero address not allowed");
-        require(_uniswapV2Factory != address(0), "Zero address not allowed");
-        require(_bagToken != address(0), "Zero address not allowed");
-        require(_protocolFeeRecipient != address(0), "Zero address not allowed");
-        require(_protocolRewards != address(0), "Zero address not allowed");
-        require(_weth != address(0), "Zero address not allowed");
-
-        tokenImplementation = _tokenImplementation;
-        governorImplementation = _governorImplementation;
-        bondingCurve = _bondingCurve;
-        poolCreationSubsidy = _poolCreationSubsidy;
-        uniswapV2Factory = _uniswapV2Factory;
-        BAG = IERC20(_bagToken);
-        protocolFeeRecipient = _protocolFeeRecipient;
-        protocolRewards = _protocolRewards;
-        WETH = _weth;
-
-        emit ContractAddressesUpdated(
-            _tokenImplementation,
-            _governorImplementation,
-            _bondingCurve,
-            _poolCreationSubsidy,
-            _uniswapV2Factory,
-            _bagToken,
-            _protocolFeeRecipient,
-            _protocolRewards,
-            _weth
-        );
-    }
-
-    function updateAgentCreationFee(uint256 _newFee) external onlyOwner {
-        uint256 oldFee = agentCreationFee;
-        agentCreationFee = _newFee;
-        emit AgentCreationFeeUpdated(oldFee, _newFee);
-    }
-
-    /// @notice Creates an AICO token with bonding curve mechanics that graduates to Uniswap V2
-    /// @param _agentCreator The address of the Agent creator
-    /// @param _platformReferrer The address of the platform referrer
-    /// @param _agentWallet The address of the agent wallet
-    /// @param _tokenURI The ERC20z token URI
-    /// @param _name The ERC20 token name
-    /// @param _symbol The ERC20 token symbol
-    function deploy(
-        address _agentCreator,
-        address _platformReferrer,
-        address _agentWallet,
-        string memory _tokenURI,
-        string memory _name,
-        string memory _symbol,
-        uint48 _votingDelay,
-        uint32 _votingPeriod,
-        uint256 _proposalThreshold
-    ) external payable nonReentrant returns (address token, address governor) {
-        // Collect creation fee
-        require(BAG.transferFrom(msg.sender, protocolFeeRecipient, agentCreationFee), "Creation fee transfer failed");
-
-        bytes32 tokenSalt = _generateSalt(_agentCreator, _tokenURI);
-
-        token = address(Clones.cloneDeterministic(tokenImplementation, tokenSalt));
-        
-        AICO(payable(token)).initialize(
-            _agentCreator,
-            _platformReferrer,
+        // We'll replace agentWallet => governorAddress
+        // We'll also replace the final "owner_" => this factory's owner
+        // We'll also replace governanceContract_ => governorAddress
+        bytes memory newAicoInit = abi.encodeWithSelector(
+            IAICO.initialize.selector,
+            tokenCreator_,
+            platformReferrer,
             bondingCurve,
-            _agentWallet,
-            _tokenURI,
-            _name,
-            _symbol,
+            governorAddress,
+            bagToken,
+            tokenURI,
+            name,
+            symbol,
+            poolSubsidy,
+            uniswapFactory,
             protocolFeeRecipient,
             protocolRewards,
-            WETH,
-            poolCreationSubsidy,
-            uniswapV2Factory
+            owner(), 
+            governorAddress
         );
 
-        bytes32 governorSalt = keccak256(abi.encodePacked(tokenSalt, "governor"));
-        governor = address(Clones.cloneDeterministic(governorImplementation, governorSalt));
-        
-        AICOGovernor(payable(governor)).initialize(
-            IVotes(token),
-            _agentCreator,
-            _votingDelay,
-            _votingPeriod,
-            _proposalThreshold
-        );
+        ERC1967Proxy aicoProxy = new ERC1967Proxy(aicoLogic, newAicoInit);
+        aicoAddress = address(aicoProxy);
 
-        emit AICOTokenCreated(
+        // Init Governor
+        IAICOGovernorImpl gov = IAICOGovernorImpl(governorAddress);
+        gov.initialize(
+            IAICO(aicoAddress),
             address(this),
-            _agentCreator,
-            _platformReferrer,
-            protocolFeeRecipient,
-            bondingCurve,
-            _tokenURI,
-            _name,
-            _symbol,
-            address(token),
-            address(0) // Pool address is not created at deployment
+            uint48(votingDelay),
+            uint32(votingPeriod),
+            proposalThreshold
         );
 
-        emit GovernorCreated(
-            token,
-            governor,
-            _agentCreator,
-            _votingDelay,
-            _votingPeriod,
-            _proposalThreshold
-        );
+        // Grant initial proposal rights
+        gov.setProposerRights(tokenCreator, true);
 
-        return (token, governor);
+        // Governor self-ownership
+        gov.transferOwnership(governorAddress);
+
+        emit AICOCreated(aicoAddress, governorAddress);
     }
 
-    /// @dev Generates a unique salt for deterministic deployment
-    function _generateSalt(address _agentCreator, string memory _tokenURI) internal view returns (bytes32) {
-        return keccak256(
-            abi.encodePacked(
-                msg.sender,
-                _agentCreator,
-                keccak256(abi.encodePacked(_tokenURI)),
-                block.coinbase,
-                block.number,
-                block.prevrandao,
-                block.timestamp,
-                tx.gasprice,
-                tx.origin
-            )
-        );
+    // admin updates
+    function setAICOLogic(address _newLogic) external onlyOwner {
+        aicoLogic = _newLogic;
     }
 
-    /// @notice The implementation address of the factory contract
-    function implementation() external view returns (address) {
-        return ERC1967Utils.getImplementation();
+    function setGovernorLogic(address _newLogic) external onlyOwner {
+        governorLogic = _newLogic;
     }
-
-    /// @dev Authorizes an upgrade to a new implementation
-    /// @param _newImpl The new implementation address
-    function _authorizeUpgrade(address _newImpl) internal override onlyOwner {}
-} 
+}

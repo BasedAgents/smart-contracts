@@ -4,9 +4,16 @@ pragma solidity ^0.8.23;
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IUniswapV2Factory} from "./interfaces/IUniswapV2Factory.sol";
 
-contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable, UUPSUpgradeable {
+/// @custom:oz-upgrades-unsafe-allow constructor
+contract PoolCreationSubsidy is 
+    Initializable,
+    UUPSUpgradeable,
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable
+{
     address public uniswapV2Factory;
     mapping(address => bool) public authorizedCallers;
 
@@ -14,33 +21,31 @@ contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable, 
     event CallerAuthorized(address indexed caller, bool status);
     event ETHReceived(address indexed sender, uint256 amount);
 
-    modifier onlyAuthorized() {
-        require(authorizedCallers[msg.sender], "Not authorized");
-        _;
-    }
-
-    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    function initialize(address _uniswapV2Factory, address _owner) external initializer {
+    function initialize(address _factory, address _owner) external initializer {
+        __UUPSUpgradeable_init();
         __Ownable_init(_owner);
         __ReentrancyGuard_init();
-        __UUPSUpgradeable_init();
-        uniswapV2Factory = _uniswapV2Factory;
+        uniswapV2Factory = _factory;
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-    function createPool(address token, address weth) external onlyAuthorized nonReentrant returns (address pair) {
-        // Sort token addresses (required by Uniswap V2)
-        (address token0, address token1) = token < weth ? (token, weth) : (weth, token);
-        
-        // Create the pair using protocol's ETH
-        pair = IUniswapV2Factory(uniswapV2Factory).createPair(token0, token1);
-        
-        emit PoolCreated(token, pair);
+    function createPool(address agentToken, address bagToken)
+        external
+        onlyAuthorized
+        nonReentrant
+        returns (address pair)
+    {
+        if (agentToken < bagToken) {
+            pair = IUniswapV2Factory(uniswapV2Factory).createPair(agentToken, bagToken);
+        } else {
+            pair = IUniswapV2Factory(uniswapV2Factory).createPair(bagToken, agentToken);
+        }
+        emit PoolCreated(agentToken, pair);
         return pair;
     }
 
@@ -49,15 +54,18 @@ contract PoolCreationSubsidy is OwnableUpgradeable, ReentrancyGuardUpgradeable, 
         emit CallerAuthorized(caller, status);
     }
 
-    // Function to receive ETH
     receive() external payable {
         emit ETHReceived(msg.sender, msg.value);
     }
 
-    // Emergency withdrawal function
     function withdraw(uint256 amount) external onlyOwner {
-        require(amount <= address(this).balance, "Insufficient balance");
+        require(amount <= address(this).balance, "Insufficient");
         (bool success, ) = owner().call{value: amount}("");
-        require(success, "Transfer failed");
+        require(success, "Withdraw failed");
     }
-} 
+
+    modifier onlyAuthorized() {
+        require(authorizedCallers[msg.sender], "Not authorized");
+        _;
+    }
+}
