@@ -76,8 +76,20 @@ This script resolved the verification issue that wasn't caught by the main verif
 Use this contract:
 - AICOFactory Proxy: [0xe3a9C604E31197FB817077e01dB01a384B27BD5A](https://sepolia.etherscan.io/address/0xe3a9C604E31197FB817077e01dB01a384B27BD5A#writeContract)
 
-- [ ] Verify factory points to correct AICO/Governor implementations
-- [ ] Verify factory owner permissions
+Tests:
+- [ ] Verify factory points to correct implementations:
+  1. Go to "Read Contract" tab
+  2. Call `aicoLogic()` - should return: `0xB51EBf00B54C8a31ef5076F3D77A201637Bde963`
+  3. Call `governorLogic()` - should return: `0x3c21c9bC638030AC0ea30ba76d00184d4940b265`
+
+- [ ] Verify factory owner permissions:
+  1. Go to "Read Contract" tab
+  2. Call `owner()` - should return your deployer address: `0x82fED030C262ec0262624aaD0a17A0d1eDA24EA1`
+  3. Go to "Write Contract" tab
+  4. Try to call `setAICOLogic()` with a random address from a non-owner wallet - should revert
+  5. Try to call `setGovernorLogic()` with a random address from a non-owner wallet - should revert
+  6. Connect your owner wallet and try the same calls - should allow the transaction (but don't confirm it)
+  7. Check `upgradeTo()` and `upgradeToAndCall()` have the same permission behavior
 
 ### 2. Agent Token Deployment & Management
 Use these contracts:
@@ -86,20 +98,27 @@ Use these contracts:
 - BAG Token: [0x780DB7650ef1F50d949CB56400eE03052C7853CC](https://sepolia.etherscan.io/address/0x780DB7650ef1F50d949CB56400eE03052C7853CC#writeContract)
 
 Tests:
-- [ ] Deploy new Agent token through Factory (`createAICOWithGovernor`)
-  - Set appropriate voting delay/period
-  - Use unique token name/symbol
-  - Set correct platform referrer
-- [ ] Verify Agent token metadata
-  - Check token URI
-  - Verify name and symbol
-  - Confirm initial supply (300M to Governor)
-- [ ] Test Agent token transfers
-  - Transfer between accounts
-  - Check transfer restrictions
-- [ ] Test platform referrer functionality
-  - Verify referrer fees during buys
-  - Test referrer fee distribution
+- [ ] Deploy new Agent token through Factory:
+  1. Go to "Write as Proxy" tab on AICOFactory
+  2. Call `createAICOWithGovernor` with these parameters:
+     - `aicoInitData`: `0x077f224a000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000082fed030c262ec0262624aad0a17a0d1eda24ea100000000000000000000000000000000000000000000000000000000000000a54657374204167656e740000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004544553540000000000000000000000000000000000000000000000000000000000`
+       (This encodes: name="Test Agent", symbol="TEST", platformReferrer=deployer address)
+     - `tokenCreator`: Your wallet address
+     - `votingDelay`: `1` (1 block ≈ 12 seconds)
+     - `votingPeriod`: `50` (50 blocks ≈ 10 minutes)
+     - `proposalThreshold`: `0` (no minimum tokens needed to propose)
+
+  Note: If you want to use different parameters, use the script at `scripts/encode-aico-init.js` to generate new encoded data.
+
+- [ ] After deployment, verify the new token:
+  1. Note the new AICO address from the deployment transaction
+  2. Go to "Read Contract" tab on the new AICO and verify:
+     - `name()` returns "Test Agent" (or your chosen name)
+     - `symbol()` returns "TEST" (or your chosen symbol)
+     - `decimals()` returns `18`
+     - `totalSupply()` returns `300000000000000000000000000` (300M with 18 decimals)
+     - `governor()` returns the new Governor address
+     - `balanceOf(governor_address)` returns the full 300M supply
 
 ### 3. Post-Deployment Setup & Permissions
 Use these contracts:
